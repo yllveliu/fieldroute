@@ -1,23 +1,57 @@
-import React from "react";
-import PageCard from "../components/PageCard";
+import React, { useEffect, useState } from "react";
+import DispatcherBoard from "../components/dispatcher/DispatcherBoard";
+import { fetchDispatcherJobs } from "../services/dispatcherApi";
+import type { DispatcherJob } from "../services/dispatcherApi";
 
 export default function DispatcherPage(): React.ReactElement {
-  return (
-    <div className="page-container">
-      <PageCard>
-        <h1>Dispatcher Board</h1>
-        <p className="placeholder">
-          This is a placeholder for the dispatcher job management board.
+  const [jobs, setJobs] = useState<DispatcherJob[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    fetchDispatcherJobs()
+      .then((data) => {
+        if (!mounted) return;
+        setJobs(data);
+        setError(null);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        setError(String(err));
+        setJobs([]);
+      })
+      .finally(() => mounted && setLoading(false));
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <p className="placeholder" style={{ paddingTop: "3rem" }}>
+          Loading dispatcher jobs...
         </p>
-        <p>Future features:</p>
-        <ul>
-          <li>View all service requests</li>
-          <li>Assign technicians to jobs</li>
-          <li>Manage job status</li>
-          <li>Track technician availability</li>
-          <li>Optimize route planning</li>
-        </ul>
-      </PageCard>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <p style={{ color: "#c0392b", paddingTop: "3rem" }}>
+          Error loading jobs: {error}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: "100%" }}>
+      <DispatcherBoard jobs={jobs} />
     </div>
   );
 }
