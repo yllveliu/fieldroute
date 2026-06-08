@@ -182,3 +182,20 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* Inventory table */
+.inventory-table th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #333;
+}
+.inventory-table td,
+.inventory-table th {
+  border-bottom: 1px solid transparent;
+}
+
+.placeholder {
+  color: #666;
+  margin-top: 1rem;
+}
+

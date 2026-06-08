@@ -19,6 +19,9 @@ export default function Navbar(): React.ReactElement {
           <li>
             <Link to="/dispatcher">Dispatcher</Link>
           </li>
+          <li>
+            <Link to="/inventory">Inventory</Link>
+          </li>
         </ul>
       </div>
     </nav>
