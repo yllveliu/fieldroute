@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from .routes import ai
 from .routes import debug
 from .routes import health
 from .routes import jobs
@@ -16,3 +17,4 @@ api_router.include_router(parts.router, prefix="/parts", tags=["parts"])
 api_router.include_router(dispatcher.router, prefix="/dispatcher", tags=["dispatcher"])
 api_router.include_router(debug.router, prefix="/debug", tags=["debug"])
 api_router.include_router(technicians.router, prefix="/technicians", tags=["technicians"])
+api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
