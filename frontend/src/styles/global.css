@@ -199,3 +199,268 @@ body {
   margin-top: 1rem;
 }
 
+/* ── Dispatcher Board ───────────────────────────────────────────── */
+
+.dispatcher-board {
+  width: 100%;
+}
+
+.dispatcher-board-header {
+  margin-bottom: 1.5rem;
+}
+
+.dispatcher-board-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0066cc;
+  margin-bottom: 0.25rem;
+}
+
+.board-description {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Summary cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.summary-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.09);
+  border-left: 4px solid transparent;
+}
+
+.summary-count {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+.summary-label {
+  font-size: 0.78rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Job list section */
+.job-list-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.09);
+  overflow: hidden;
+}
+
+.job-list-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.job-list-total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  color: #555;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+}
+
+.job-list-empty {
+  padding: 2rem 1.25rem;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Job groups */
+.job-group {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.job-group:last-child {
+  border-bottom: none;
+}
+
+.job-group-header {
+  padding: 0.6rem 1.25rem;
+  background: #fafafa;
+  border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.job-group-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #444;
+}
+
+.job-group-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8e8e8;
+  color: #555;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.35rem;
+}
+
+.job-list {
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Job cards */
+.job-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #fff;
+  transition: box-shadow 0.15s;
+}
+
+.job-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.job-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.job-card-customer {
+  font-weight: 600;
+  color: #222;
+  font-size: 0.95rem;
+}
+
+.job-card-service {
+  font-size: 0.8rem;
+  color: #0066cc;
+  font-weight: 500;
+}
+
+.job-card-description {
+  font-size: 0.875rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.job-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.job-card-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.job-card-eta {
+  color: #065f46;
+  font-weight: 500;
+}
+
+.job-card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.job-action-btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: 4px;
+  border: 1px solid #0066cc;
+  background: transparent;
+  color: #0066cc;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.job-action-btn:hover {
+  background: #0066cc;
+  color: #fff;
+}
+
+/* Dispatcher responsive */
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .job-card {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .job-card-actions {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .job-card-description {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 420px) {
+  .summary-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+}
+
