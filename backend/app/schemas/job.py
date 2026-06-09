@@ -16,3 +16,20 @@ class JobRequestResponse(BaseModel):
     job_id: int
     status: str
     message: str
+
+
+class JobTechnicianStatus(BaseModel):
+    """Minimal technician info exposed to customers tracking a job."""
+
+    name: str
+    status: str
+
+
+class JobStatusResponse(BaseModel):
+    """Current status of a job, used for polling-based customer tracking."""
+
+    job_id: int
+    status: str
+    eta_message: str | None = None
+    service: str | None = None
+    technician: JobTechnicianStatus | None = None
