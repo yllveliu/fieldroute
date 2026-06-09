@@ -8,6 +8,7 @@ import DispatcherPage from "./pages/DispatcherPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import InventoryPage from "./pages/InventoryPage";
 import TechniciansPage from "./pages/TechniciansPage";
+import AIPage from "./pages/AIPage";
 
 export default function App(): React.ReactElement {
   return (
@@ -23,6 +24,7 @@ export default function App(): React.ReactElement {
           <Route path="/dispatcher" element={<DispatcherPage />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/technicians" element={<TechniciansPage />} />
+          <Route path="/ai" element={<AIPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
