@@ -8,7 +8,8 @@ export default defineConfig({
     // Proxy API calls to the backend so the browser sees same-origin
     // requests in dev (avoids CORS without changing backend files).
     proxy: {
-      '/jobs': 'http://localhost:8000',
+      '/jobs': 'http://api:8000',
+      '/ai/classify': 'http://api:8000',
     },
   },
 })
