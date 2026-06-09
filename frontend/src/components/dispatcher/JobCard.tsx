@@ -4,9 +4,10 @@ import type { DispatcherJob } from "../../services/dispatcherApi";
 
 interface JobCardProps {
   job: DispatcherJob;
+  onAssign?: (job: DispatcherJob) => void;
 }
 
-export default function JobCard({ job }: JobCardProps): React.ReactElement {
+export default function JobCard({ job, onAssign }: JobCardProps): React.ReactElement {
   const hasAddress = job.customer?.address;
   const hasEta = job.eta_message;
   const hasTechnician = job.technician;
@@ -54,7 +55,15 @@ export default function JobCard({ job }: JobCardProps): React.ReactElement {
       </div>
       <div className="job-card-actions">
         <StatusBadge status={job.status} />
-        <button className="job-action-btn" type="button">
+        <button
+          className="job-action-btn"
+          type="button"
+          onClick={() => {
+            if ((job.status === "open" || job.status === "new") && onAssign) {
+              onAssign(job);
+            }
+          }}
+        >
           {actionLabel}
         </button>
       </div>

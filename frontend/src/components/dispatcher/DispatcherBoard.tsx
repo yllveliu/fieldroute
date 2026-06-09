@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import JobCard from "./JobCard";
+import AssignmentModal from "../assignment/AssignmentModal";
 import type { DispatcherJob } from "../../services/dispatcherApi";
 
 interface SummaryCardProps {
@@ -40,6 +41,8 @@ interface DispatcherBoardProps {
 }
 
 export default function DispatcherBoard({ jobs }: DispatcherBoardProps): React.ReactElement {
+  const [assigningJob, setAssigningJob] = useState<DispatcherJob | null>(null);
+
   const countByStatus = (statuses: string[]) =>
     jobs.filter((j) => statuses.includes(j.status.toLowerCase())).length;
 
@@ -107,13 +110,20 @@ export default function DispatcherBoard({ jobs }: DispatcherBoardProps): React.R
               </div>
               <div className="job-list">
                 {sectionJobs.map((job) => (
-                  <JobCard key={job.id} job={job} />
+                  <JobCard key={job.id} job={job} onAssign={setAssigningJob} />
                 ))}
               </div>
             </div>
           );
         })}
       </div>
+
+      {assigningJob && (
+        <AssignmentModal
+          job={assigningJob}
+          onClose={() => setAssigningJob(null)}
+        />
+      )}
     </div>
   );
 }
