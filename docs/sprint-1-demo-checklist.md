@@ -39,12 +39,6 @@ docker compose up -d --build db api
 docker compose exec api alembic upgrade head
 ```
 
-**Seed the database:**
-
-```bash
-docker compose exec api python -m app.db.seed
-```
-
 **Start the frontend:**
 
 ```bash
@@ -85,7 +79,7 @@ Walk through the following steps in order. Check each one off as you go.
 - Backend (FastAPI) and frontend (React/Vite) skeletons are fully set up
 - PostgreSQL is connected and accessible from the API
 - Alembic migrations can run cleanly from scratch
-- Seed data exists and is loaded after migrations with a single seed command
+- Seed data exists and populates the database on migration
 - Customer request API (`/jobs` or equivalent) accepts and stores requests
 - Dispatcher board API returns job listings
 - Technicians API returns the technician list

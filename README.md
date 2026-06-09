@@ -82,7 +82,7 @@ This applies all available migrations to the PostgreSQL database.
 Seed data is available in `backend/app/db/seed.py`. Run it after migrations with:
 
 ```bash
-docker compose exec api python -m app.db.seed
+docker compose exec api python app/db/seed.py
 ```
 
 This will populate sample services, technicians, customers, parts, and jobs.
@@ -100,3 +100,4 @@ This will populate sample services, technicians, customers, parts, and jobs.
 - Ports in use: `8000`, `5173`, or `5432` must be free for the app and database
 - DB connection issues: verify `.env` values and that the `db` service is running
 - Migration command fails: ensure `docker compose up -d --build db api` has been started and the `api` service is available
+"# FieldRoute" 
