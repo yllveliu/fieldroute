@@ -28,3 +28,8 @@ def create_job_request(db: Session, payload: JobRequestCreate) -> Job:
     db.commit()
     db.refresh(job)
     return job
+
+
+def get_job(db: Session, job_id: int) -> Job | None:
+    """Return the job with the given id, or None if it does not exist."""
+    return db.get(Job, job_id)
