@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppLayout from "./layout/AppLayout";
 import HomePage from "./pages/HomePage";
 import CustomerPage from "./pages/CustomerPage";
+import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import DispatcherPage from "./pages/DispatcherPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import InventoryPage from "./pages/InventoryPage";
@@ -15,6 +16,10 @@ export default function App(): React.ReactElement {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/customer" element={<CustomerPage />} />
+          <Route
+            path="/customer/tracking/:jobId"
+            element={<CustomerTrackingPage />}
+          />
           <Route path="/dispatcher" element={<DispatcherPage />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/technicians" element={<TechniciansPage />} />
