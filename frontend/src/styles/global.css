@@ -199,3 +199,100 @@ body {
   margin-top: 1rem;
 }
 
+/* Technician filters */
+.technician-filters {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-input,
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #333;
+  background: #fff;
+  flex: 1;
+  min-width: 140px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #0066cc;
+}
+
+/* Technician list */
+.technician-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Technician card */
+.technician-card {
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+}
+
+.technician-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.technician-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #222;
+}
+
+.technician-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Skill badge */
+.skill-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background-color: #e8f0fe;
+  color: #0052a3;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: inline-block;
+}
+
+.no-skills {
+  color: #999;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+

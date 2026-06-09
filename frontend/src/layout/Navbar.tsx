@@ -22,6 +22,9 @@ export default function Navbar(): React.ReactElement {
           <li>
             <Link to="/inventory">Inventory</Link>
           </li>
+          <li>
+            <Link to="/technicians">Technicians</Link>
+          </li>
         </ul>
       </div>
     </nav>
