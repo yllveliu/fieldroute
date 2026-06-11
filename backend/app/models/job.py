@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Float, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
@@ -26,6 +26,9 @@ class Job(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+    ai_service_type: Mapped[str | None] = mapped_column(String, nullable=True)
+    ai_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    ai_explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     customer: Mapped["Customer"] = relationship("Customer", back_populates="jobs")
     service: Mapped["Service | None"] = relationship("Service", back_populates="jobs")
