@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -47,4 +49,108 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+}
+
+/* ── FieldRoute design tokens ─────────────────────────────────────── */
+:root {
+  /* ── Brand colors ── */
+  --fr-primary:        #2563EB;
+  --fr-primary-hover:  #1D4ED8;
+  --fr-secondary:      #1E40AF;
+  --fr-accent:         #06B6D4;
+  --fr-accent-hover:   #0891B2;
+
+  /* ── Semantic colors ── */
+  --fr-success:        #16A34A;
+  --fr-success-light:  #DCFCE7;
+  --fr-warning:        #D97706;
+  --fr-warning-light:  #FEF3C7;
+  --fr-danger:         #DC2626;
+  --fr-danger-light:   #FEE2E2;
+  --fr-info:           #0EA5E9;
+  --fr-info-light:     #E0F2FE;
+
+  /* ── Neutrals ── */
+  --fr-dark:           #0F172A;
+  --fr-surface:        #F8FAFC;
+  --fr-surface-raised: #FFFFFF;
+  --fr-border:         #E2E8F0;
+  --fr-border-strong:  #CBD5E1;
+  --fr-muted:          #64748B;
+  --fr-muted-light:    #94A3B8;
+
+  /* ── Status badge colors ── */
+  --fr-status-new:         #6366F1;
+  --fr-status-categorized: #8B5CF6;
+  --fr-status-assigned:    #2563EB;
+  --fr-status-en-route:    #D97706;
+  --fr-status-done:        #16A34A;
+
+  /* ── Typography ── */
+  --fr-font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --fr-text-xs:    0.75rem;
+  --fr-text-sm:    0.875rem;
+  --fr-text-base:  1rem;
+  --fr-text-lg:    1.125rem;
+  --fr-text-xl:    1.25rem;
+  --fr-text-2xl:   1.5rem;
+
+  /* ── Spacing ── */
+  --fr-space-1:  0.25rem;
+  --fr-space-2:  0.5rem;
+  --fr-space-3:  0.75rem;
+  --fr-space-4:  1rem;
+  --fr-space-6:  1.5rem;
+  --fr-space-8:  2rem;
+  --fr-space-12: 3rem;
+
+  /* ── Radius ── */
+  --fr-radius-sm:   0.375rem;
+  --fr-radius-md:   0.5rem;
+  --fr-radius-lg:   0.75rem;
+  --fr-radius-xl:   1rem;
+  --fr-radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --fr-shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --fr-shadow-md:  0 4px 12px rgba(0,0,0,0.10);
+  --fr-shadow-lg:  0 8px 24px rgba(0,0,0,0.12);
+  --fr-shadow-ai:  0 0 20px rgba(6,182,212,0.25);
+
+  /* ── Transitions ── */
+  --fr-transition-fast:   150ms ease;
+  --fr-transition-normal: 250ms ease;
+  --fr-transition-slow:   400ms ease;
+}
+
+/* ── Global base styles ───────────────────────────────────────────── */
+body {
+  font-family: var(--fr-font-sans);
+  background-color: var(--fr-surface);
+  color: var(--fr-dark);
+}
+
+/* ── Keyframe animations ──────────────────────────────────────────── */
+
+/* AI panel glow pulse — used on AI suggestion panel */
+@keyframes fr-ai-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.3), 0 0 16px rgba(6, 182, 212, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.6), 0 0 40px rgba(6, 182, 212, 0.2);
+  }
+}
+
+/* Status badge pulse — used on active/en-route status badges */
+@keyframes fr-status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(0.97); }
+}
+
+/* Node pulse — used on map markers and live indicators */
+@keyframes fr-node-pulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.4); opacity: 0.5; }
+  100% { transform: scale(1);   opacity: 1; }
 }
