@@ -11,69 +11,102 @@ from app.models.technician import Technician
 # Data
 # ---------------------------------------------------------------------------
 
-SERVICES = [
-    {"name": "Plumbing", "description": "Pipe repair, installation, and leak fixes"},
-    {"name": "Electrical", "description": "Wiring, panel upgrades, and outlet installs"},
-    {"name": "HVAC", "description": "Heating, ventilation, and air conditioning service"},
-    {"name": "Carpentry", "description": "Structural and finish carpentry work"},
-]
-
 TECHNICIANS = [
-    {"name": "Marco Rossi",    "skills": ["plumbing", "pipe fitting"],       "status": "available"},
-    {"name": "Sara Kelmendi",  "skills": ["electrical", "panel upgrades"],   "status": "available"},
-    {"name": "Liam Novak",     "skills": ["hvac", "refrigeration"],          "status": "on_job"},
-    {"name": "Ana Ferreira",   "skills": ["plumbing", "hvac"],               "status": "available"},
-    {"name": "Jake Thornton",  "skills": ["carpentry", "drywall"],           "status": "available"},
-    {"name": "Drita Hoxha",    "skills": ["electrical", "lighting"],         "status": "off"},
-]
-
-CUSTOMERS = [
-    {"name": "Alice Müller",   "phone": "555-0101", "address": "12 Oak St, Springfield"},
-    {"name": "Bob Patel",      "phone": "555-0102", "address": "34 Elm Ave, Shelbyville"},
-    {"name": "Carol Ionescu",  "phone": "555-0103", "address": "56 Maple Rd, Capital City"},
-    {"name": "David Okafor",   "phone": "555-0104", "address": "78 Pine Blvd, Ogdenville"},
+    {"name": "Diego Ramos",   "skills": ["plumbing", "pipework"],     "status": "available"},
+    {"name": "Aisha Khan",    "skills": ["electrical", "wiring"],     "status": "available"},
+    {"name": "Sam Whitfield", "skills": ["HVAC", "refrigeration"],    "status": "available"},
+    {"name": "Priya Nair",    "skills": ["plumbing", "drainage"],     "status": "on_job"},
+    {"name": "Marcus Lee",    "skills": ["electrical", "solar"],      "status": "available"},
+    {"name": "Nina Costa",    "skills": ["HVAC", "ventilation"],      "status": "available"},
 ]
 
 PARTS = [
-    {"name": "Copper Pipe 1/2\"",       "sku": "PL-001", "stock_quantity": 50, "reserved_qty": 0},
-    {"name": "PVC Elbow 90°",           "sku": "PL-002", "stock_quantity": 30, "reserved_qty": 2},
-    {"name": "Circuit Breaker 20A",     "sku": "EL-001", "stock_quantity": 20, "reserved_qty": 0},
-    {"name": "Wire Nut Assortment",     "sku": "EL-002", "stock_quantity": 100,"reserved_qty": 0},
-    {"name": "HVAC Filter 16x20",       "sku": "HV-001", "stock_quantity": 15, "reserved_qty": 1},
-    {"name": "Refrigerant R-410A",      "sku": "HV-002", "stock_quantity": 8,  "reserved_qty": 0},
-    {"name": "Pipe Wrench 14\"",        "sku": "TL-001", "stock_quantity": 10, "reserved_qty": 0},
-    {"name": "Teflon Tape Roll",        "sku": "PL-003", "stock_quantity": 60, "reserved_qty": 0},
-    {"name": "Junction Box 4\"",        "sku": "EL-003", "stock_quantity": 25, "reserved_qty": 0},
-    {"name": "Wood Screw #8 x 2\"",     "sku": "CP-001", "stock_quantity": 200,"reserved_qty": 0},
+    {"name": "PVC Pipe 2in",        "sku": "SKU-PVC-075", "stock_quantity": 50,  "reserved_qty": 0,  "low_stock_threshold": 5},
+    {"name": "Copper Wire 12AWG",   "sku": "SKU-CWR-120", "stock_quantity": 200, "reserved_qty": 10, "low_stock_threshold": 20},
+    {"name": "HVAC Filter 16x25",   "sku": "SKU-HVF-162", "stock_quantity": 30,  "reserved_qty": 5,  "low_stock_threshold": 5},
+    {"name": "Circuit Breaker 20A", "sku": "SKU-CBK-020", "stock_quantity": 15,  "reserved_qty": 2,  "low_stock_threshold": 5},
+    {"name": "Drain Snake 25ft",    "sku": "SKU-DRS-025", "stock_quantity": 8,   "reserved_qty": 0,  "low_stock_threshold": 3},
+    {"name": "Refrigerant R-410A",  "sku": "SKU-REF-410", "stock_quantity": 12,  "reserved_qty": 3,  "low_stock_threshold": 5},
+]
+
+SERVICES = [
+    {"name": "Plumbing Repair",       "description": "Pipe repair, leak fixes, and drainage work"},
+    {"name": "Electrical Inspection", "description": "Wiring checks, panel inspection, and safety testing"},
+    {"name": "HVAC Maintenance",      "description": "Heating and cooling system servicing and repair"},
+    {"name": "Drain Cleaning",        "description": "Clearing blocked drains and sewer lines"},
+    {"name": "Solar Panel Install",   "description": "Solar panel installation and inspection"},
+    {"name": "Ventilation Service",   "description": "Ventilation system inspection and airflow repair"},
+]
+
+CUSTOMERS = [
+    {"name": "Alice Müller",  "phone": "555-0101", "address": "12 Oak St, Springfield"},
+    {"name": "Bob Patel",     "phone": "555-0102", "address": "34 Elm Ave, Shelbyville"},
+    {"name": "Carol Ionescu", "phone": "555-0103", "address": "56 Maple Rd, Capital City"},
+    {"name": "David Okafor",  "phone": "555-0104", "address": "78 Pine Blvd, Ogdenville"},
+]
+
+JOBS = [
+    {
+        "customer": "Alice Müller",
+        "service": "Plumbing Repair",
+        "raw_description": "Burst pipe under kitchen sink",
+        "status": "new",
+        "technician": None,
+    },
+    {
+        "customer": "Bob Patel",
+        "service": "Electrical Inspection",
+        "raw_description": "Flickering lights, possible short",
+        "status": "categorized",
+        "technician": None,
+    },
+    {
+        "customer": "Carol Ionescu",
+        "service": "HVAC Maintenance",
+        "raw_description": "AC unit not cooling properly",
+        "status": "assigned",
+        "technician": "Sam Whitfield",
+    },
+    {
+        "customer": "David Okafor",
+        "service": "Drain Cleaning",
+        "raw_description": "Blocked main drain",
+        "status": "en_route",
+        "technician": "Priya Nair",
+    },
+    {
+        "customer": "Alice Müller",
+        "service": "Solar Panel Install",
+        "raw_description": "Annual solar panel inspection",
+        "status": "done",
+        "technician": "Marcus Lee",
+    },
+    {
+        "customer": "Bob Patel",
+        "service": "Ventilation Service",
+        "raw_description": "Poor airflow in office building",
+        "status": "new",
+        "technician": None,
+    },
 ]
 
 
-def _seed_services(session: object) -> dict[str, Service]:
+# ---------------------------------------------------------------------------
+# Seed functions
+# ---------------------------------------------------------------------------
+
+
+def _seed_technicians(session: object) -> dict[str, Technician]:
     result = {}
-    for data in SERVICES:
-        obj = session.query(Service).filter_by(name=data["name"]).first()
-        if not obj:
-            obj = Service(**data)
-            session.add(obj)
-            session.flush()
-        result[data["name"]] = obj
-    return result
-
-
-def _seed_technicians(session: object) -> None:
     for data in TECHNICIANS:
-        if not session.query(Technician).filter_by(name=data["name"]).first():
-            session.add(Technician(**data))
-
-
-def _seed_customers(session: object) -> dict[str, Customer]:
-    result = {}
-    for data in CUSTOMERS:
-        obj = session.query(Customer).filter_by(phone=data["phone"]).first()
+        obj = session.query(Technician).filter_by(name=data["name"]).first()
         if not obj:
-            obj = Customer(**data)
+            obj = Technician(**data)
             session.add(obj)
             session.flush()
+        else:
+            obj.skills = data["skills"]
+            obj.status = data["status"]
         result[data["name"]] = obj
     return result
 
@@ -86,7 +119,41 @@ def _seed_parts(session: object) -> dict[str, Part]:
             obj = Part(**data)
             session.add(obj)
             session.flush()
+        else:
+            obj.name = data["name"]
+            obj.stock_quantity = data["stock_quantity"]
+            obj.reserved_qty = data["reserved_qty"]
+            obj.low_stock_threshold = data["low_stock_threshold"]
         result[data["sku"]] = obj
+    return result
+
+
+def _seed_services(session: object) -> dict[str, Service]:
+    result = {}
+    for data in SERVICES:
+        obj = session.query(Service).filter_by(name=data["name"]).first()
+        if not obj:
+            obj = Service(**data)
+            session.add(obj)
+            session.flush()
+        else:
+            obj.description = data["description"]
+        result[data["name"]] = obj
+    return result
+
+
+def _seed_customers(session: object) -> dict[str, Customer]:
+    result = {}
+    for data in CUSTOMERS:
+        obj = session.query(Customer).filter_by(phone=data["phone"]).first()
+        if not obj:
+            obj = Customer(**data)
+            session.add(obj)
+            session.flush()
+        else:
+            obj.name = data["name"]
+            obj.address = data["address"]
+        result[data["name"]] = obj
     return result
 
 
@@ -94,60 +161,23 @@ def _seed_jobs(
     session: object,
     services: dict[str, Service],
     customers: dict[str, Customer],
-    parts: dict[str, Part],
+    technicians: dict[str, Technician],
 ) -> None:
-    if session.query(Job).count() > 0:
-        return  # already seeded
+    # Jobs are test data: clear and re-create on every run for a clean demo state.
+    session.query(JobPart).delete()
+    session.query(Job).delete()
+    session.flush()
 
-    jobs_data = [
-        {
-            "customer": customers["Alice Müller"],
-            "service": services["Plumbing"],
-            "raw_description": "Kitchen sink is dripping constantly. Water pressure also seems low.",
-            "status": "new",
-            "parts": [("PL-001", 2), ("PL-003", 1)],
-        },
-        {
-            "customer": customers["Bob Patel"],
-            "service": services["Electrical"],
-            "raw_description": "Breaker keeps tripping in the living room. Outlets not working.",
-            "status": "categorized",
-            "parts": [("EL-001", 1), ("EL-002", 1)],
-        },
-        {
-            "customer": customers["Carol Ionescu"],
-            "service": services["HVAC"],
-            "raw_description": "AC unit not cooling. Strange noise from the outdoor unit.",
-            "status": "new",
-            "parts": [("HV-001", 1), ("HV-002", 1)],
-        },
-        {
-            "customer": customers["David Okafor"],
-            "service": services["Carpentry"],
-            "raw_description": "Front door frame is cracked and door doesn't close properly.",
-            "status": "new",
-            "parts": [("CP-001", 10)],
-        },
-        {
-            "customer": customers["Alice Müller"],
-            "service": services["Plumbing"],
-            "raw_description": "Bathroom toilet is running continuously. Needs flapper replaced.",
-            "status": "categorized",
-            "parts": [],
-        },
-    ]
-
-    for jd in jobs_data:
+    for data in JOBS:
+        technician = technicians[data["technician"]] if data["technician"] else None
         job = Job(
-            customer_id=jd["customer"].id,
-            service_id=jd["service"].id,
-            raw_description=jd["raw_description"],
-            status=jd["status"],
+            customer_id=customers[data["customer"]].id,
+            service_id=services[data["service"]].id,
+            technician_id=technician.id if technician else None,
+            raw_description=data["raw_description"],
+            status=data["status"],
         )
         session.add(job)
-        session.flush()
-        for sku, qty in jd["parts"]:
-            session.add(JobPart(job_id=job.id, part_id=parts[sku].id, qty_needed=qty))
 
 
 def run() -> None:
@@ -155,13 +185,13 @@ def run() -> None:
 
     session = SessionLocal()
     try:
+        technicians = _seed_technicians(session)
+        _seed_parts(session)
         services = _seed_services(session)
-        _seed_technicians(session)
         customers = _seed_customers(session)
-        parts = _seed_parts(session)
-        _seed_jobs(session, services, customers, parts)
+        _seed_jobs(session, services, customers, technicians)
         session.commit()
-        print("Seed complete: services=4, technicians=6, customers=4, parts=10, jobs=5")
+        print("Seed complete: technicians=6, parts=6, services=6, customers=4, jobs=6")
     except Exception:
         session.rollback()
         raise
