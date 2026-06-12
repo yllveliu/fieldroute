@@ -37,3 +37,104 @@ def get_job(db: Session, job_id: int) -> Job | None:
         job_id,
         options=[joinedload(Job.technician), joinedload(Job.service)],
     )
+
+
+def classify_problem(text: str) -> dict[str, str | float | int]:
+    """Classify a problem description using keyword-based service categories."""
+    normalized = (text or "").lower()
+    categories = {
+        "Plumbing": [
+            "pipe",
+            "leak",
+            "drain",
+            "water",
+            "plumb",
+            "sewage",
+            "burst",
+            "flood",
+            "clog",
+            "faucet",
+            "sink",
+            "toilet",
+            "shower",
+            "valve",
+            "pressure",
+        ],
+        "Electrical": [
+            "electric",
+            "wire",
+            "circuit",
+            "outlet",
+            "breaker",
+            "panel",
+            "voltage",
+            "power",
+            "light",
+            "switch",
+            "socket",
+            "fuse",
+            "short",
+            "wiring",
+            "sparks",
+        ],
+        "HVAC": [
+            "hvac",
+            "heat",
+            "cool",
+            "air",
+            "ventilat",
+            "refriger",
+            "furnace",
+            "thermostat",
+            "duct",
+            "ac",
+            "conditioning",
+            "compressor",
+            "filter",
+            "airflow",
+            "boiler",
+        ],
+        "Carpentry": [
+            "wood",
+            "door",
+            "window",
+            "cabinet",
+            "floor",
+            "ceiling",
+            "roof",
+            "wall",
+            "frame",
+            "tile",
+            "drywall",
+            "carpent",
+            "hinge",
+            "lock",
+            "repair",
+        ],
+    }
+
+    counts = {category: sum(1 for keyword in keywords if keyword in normalized) for category, keywords in categories.items()}
+    winner = max(counts, key=lambda category: (counts[category], -list(categories).index(category)))
+    winner_count = counts[winner]
+
+    if winner_count == 0:
+        return {
+            "service_type": "General",
+            "confidence": 0.5,
+            "explanation": "No specific keywords matched.",
+            "count": 0,
+        }
+
+    if winner_count >= 3:
+        confidence = 0.95
+    elif winner_count == 2:
+        confidence = 0.80
+    else:
+        confidence = 0.65
+
+    return {
+        "service_type": winner,
+        "confidence": confidence,
+        "explanation": f"Matched {winner_count} {winner} keyword(s) in problem description.",
+        "count": winner_count,
+    }
