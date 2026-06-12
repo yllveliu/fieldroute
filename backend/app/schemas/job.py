@@ -1,4 +1,27 @@
 from pydantic import BaseModel, Field
+from typing import Optional
+
+
+class TechnicianSummary(BaseModel):
+    id: int
+    name: str
+    status: str
+
+    model_config = {"from_attributes": True}
+
+
+class JobDetailResponse(BaseModel):
+    id: int
+    status: str
+    service_name: Optional[str] = None
+    problem_description: Optional[str] = None
+    eta_message: Optional[str] = None
+    technician: Optional[TechnicianSummary] = None
+    ai_service_type: Optional[str] = None
+    ai_confidence: Optional[float] = None
+    ai_explanation: Optional[str] = None
+
+    model_config = {"from_attributes": True}
 
 
 class JobRequestCreate(BaseModel):
