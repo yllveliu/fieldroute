@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.schemas.job import (
+    JobDetailResponse,
     JobRequestCreate,
     JobRequestResponse,
     JobStatusResponse,
     JobTechnicianStatus,
+    TechnicianSummary,
 )
 from app.services.job_service import create_job_request, get_job
 
@@ -44,4 +46,32 @@ def get_job_status(job_id: int, db: Session = Depends(get_db)):
         eta_message=job.eta_message,
         service=job.service.name if job.service is not None else None,
         technician=technician,
+    )
+
+
+@router.get("/{job_id}", response_model=JobDetailResponse)
+def get_job_detail(job_id: int, db: Session = Depends(get_db)):
+    """Return the rich detail for a single job."""
+    job = get_job(db, job_id)
+    if job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+
+    technician = None
+    if job.technician is not None:
+        technician = TechnicianSummary(
+            id=job.technician.id,
+            name=job.technician.name,
+            status=job.technician.status,
+        )
+
+    return JobDetailResponse(
+        id=job.id,
+        status=job.status,
+        service_name=job.service.name if job.service is not None else None,
+        problem_description=job.raw_description,
+        eta_message=job.eta_message,
+        technician=technician,
+        ai_service_type=job.ai_service_type,
+        ai_confidence=job.ai_confidence,
+        ai_explanation=job.ai_explanation,
     )

@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.customer import Customer
 from app.models.job import Job
@@ -32,4 +32,8 @@ def create_job_request(db: Session, payload: JobRequestCreate) -> Job:
 
 def get_job(db: Session, job_id: int) -> Job | None:
     """Return the job with the given id, or None if it does not exist."""
-    return db.get(Job, job_id)
+    return db.get(
+        Job,
+        job_id,
+        options=[joinedload(Job.technician), joinedload(Job.service)],
+    )
