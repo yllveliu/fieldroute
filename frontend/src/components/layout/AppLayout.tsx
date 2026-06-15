@@ -11,6 +11,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/jobs':        'Jobs',
   '/inventory':   'Inventory',
   '/customer':    'Customers',
+  '/ai':          'AI Classification',
 }
 
 export function AppLayout() {
