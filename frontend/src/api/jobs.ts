@@ -27,6 +27,25 @@ export interface ClassifyResult {
   ai_explanation: string
 }
 
+export interface CreateJobRequest {
+  customer_name: string
+  phone: string
+  address: string
+  raw_description: string
+}
+
+export interface CreateJobResponse {
+  job_id: number
+  status: string
+  message: string
+}
+
+export async function createJob(
+  data: CreateJobRequest
+): Promise<CreateJobResponse> {
+  return apiPost<CreateJobResponse>('/jobs', data)
+}
+
 export async function getJobById(id: number): Promise<JobDetail> {
   return apiGet<JobDetail>(`/jobs/${id}`)
 }
