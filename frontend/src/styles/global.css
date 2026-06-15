@@ -1052,3 +1052,215 @@ body {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   COMPREHENSIVE RESPONSIVE OVERRIDES
+   768px → standard mobile   480px → small mobile   360px → tiny
+══════════════════════════════════════════════════════════════════ */
+
+/* ── 768px ──────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Layout */
+  .app-main {
+    padding: 1.25rem 0.875rem;
+  }
+
+  /* Page container gets a tiny gutter so cards don't bleed */
+  .page-container {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  /* Dispatcher header */
+  .dispatcher-board-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .board-description {
+    font-size: 0.9rem;
+  }
+
+  /* Tighter inner padding on dispatcher lists */
+  .job-list {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .job-group-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .job-list-header {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Bigger touch targets for action buttons */
+  .job-action-btn {
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  /* AI page */
+  .ai-input-card {
+    padding: 1rem;
+  }
+
+  .ai-panel-body {
+    padding: 1rem;
+  }
+
+  /* Technician card */
+  .technician-card {
+    padding: 0.75rem;
+  }
+
+  /* Tracking summary: stack ID + badge */
+  .tracking-summary {
+    padding: 0.875rem 1rem;
+  }
+
+  .tracking-summary-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* Prevent iOS from zooming on input focus */
+  .filter-input,
+  .filter-select,
+  .form-input,
+  .form-textarea {
+    font-size: 1rem;
+  }
+}
+
+/* ── 480px – small mobile ───────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Layout */
+  .app-main {
+    padding: 1rem 0.625rem;
+  }
+
+  /* Navbar: smaller horizontal gap so links don't overflow */
+  .navbar-menu {
+    gap: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  /* Page cards */
+  .page-card {
+    padding: 1.25rem 1rem;
+    border-radius: 6px;
+  }
+
+  .page-card h1 {
+    font-size: 1.35rem;
+  }
+
+  /* Stat summary cards: keep 2-col but tighter */
+  .summary-cards {
+    gap: 0.5rem;
+  }
+
+  .summary-card {
+    padding: 0.875rem;
+  }
+
+  .summary-count {
+    font-size: 1.5rem;
+  }
+
+  .summary-label {
+    font-size: 0.72rem;
+  }
+
+  /* Dispatcher header */
+  .dispatcher-board-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .dispatcher-board-header {
+    margin-bottom: 1rem;
+  }
+
+  /* AI demo buttons: stack full-width */
+  .ai-demo-row {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .ai-demo-btn {
+    width: 100%;
+    text-align: left;
+  }
+
+  /* Technician card header: allow badge to wrap below name */
+  .technician-card-header {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  /* Timeline: tighter dots */
+  .timeline-step {
+    padding-top: 1.4rem;
+  }
+
+  .timeline-label {
+    font-size: 0.62rem;
+  }
+
+  /* Form fields */
+  .form-field label {
+    font-size: 0.875rem;
+  }
+
+  /* Button full-width */
+  .button {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+/* ── 360px – very small phones ──────────────────────────────────── */
+@media (max-width: 360px) {
+  .app-main {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .page-card {
+    padding: 1rem 0.75rem;
+  }
+
+  /* Single column summary cards on very small screens */
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar-container {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .navbar-menu {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+  }
+
+  .dispatcher-board-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .job-list {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .ai-page {
+    padding: 0;
+  }
+
+  .ai-input-card,
+  .ai-panel-body {
+    padding: 0.75rem;
+  }
+}
+
