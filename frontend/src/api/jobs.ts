@@ -53,3 +53,20 @@ export async function getJobById(id: number): Promise<JobDetail> {
 export async function classifyJob(id: number): Promise<ClassifyResult> {
   return apiPost<ClassifyResult>(`/jobs/${id}/classify`)
 }
+
+export interface AssignJobRequest {
+  technician_id: number
+}
+
+export interface AssignJobResponse {
+  job_id: number
+  technician_id: number
+  status: string
+}
+
+export async function assignJob(
+  jobId: number,
+  data: AssignJobRequest
+): Promise<AssignJobResponse> {
+  return apiPost<AssignJobResponse>(`/jobs/${jobId}/assign`, data)
+}
