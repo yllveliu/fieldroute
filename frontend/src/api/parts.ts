@@ -10,7 +10,7 @@ export interface Part {
 }
 
 export async function getParts(): Promise<Part[]> {
-  return apiGet<Part[]>('/parts')
+  return apiGet<Part[]>('/parts/')
 }
 
 export async function getPartById(id: number): Promise<Part> {
