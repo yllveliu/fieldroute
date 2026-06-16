@@ -214,7 +214,7 @@ export default function TrackingPage() {
                   )}
                 </div>
                 <p className="mt-1 text-sm text-slate-500">
-                  {job.service_name} · {job.customer_name}
+                  {[job.service_name, job.customer_name].filter(Boolean).join(' · ')}
                 </p>
               </div>
               <StatusBadge status={job.status} />
@@ -249,9 +249,9 @@ export default function TrackingPage() {
                   <p className="text-xs text-slate-500 capitalize">
                     {job.technician.status.replace('_', ' ')}
                   </p>
-                  {job.technician.skills.length > 0 && (
+                  {(job.technician.skills?.length ?? 0) > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {job.technician.skills.map(skill => (
+                      {job.technician.skills!.map(skill => (
                         <SkillBadge key={skill} skill={skill} />
                       ))}
                     </div>

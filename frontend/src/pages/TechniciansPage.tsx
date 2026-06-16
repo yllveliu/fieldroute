@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import { fetchTechnicians } from "../services/techniciansApi";
-import type { Technician } from "../services/techniciansApi";
+import { getTechnicians } from "../api/technicians";
+import type { Technician } from "../api/technicians";
 import TechnicianCard from "../components/technicians/TechnicianCard";
 import { getSkillConfig } from "../data/skillConfig";
 
@@ -28,7 +28,7 @@ export default function TechniciansPage(): React.ReactElement {
 
   useEffect(() => {
     let mounted = true;
-    fetchTechnicians()
+    getTechnicians()
       .then((data) => {
         if (!mounted) return;
         setTechnicians(data);

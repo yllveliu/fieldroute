@@ -1,42 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  getJobStatus,
-  JobNotFoundError,
-  JobStatus,
-} from "../services/jobsApi";
-import StatusBadge from "../components/common/StatusBadge";
-import StatusTimeline from "../components/customer/StatusTimeline";
+import { Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { getJobById } from "../api/jobs";
+import type { JobDetail } from "../api/jobs";
+import { ApiError } from "../api/client";
+import { StatusBadge } from "../components/primitives/StatusBadge";
+
+const STATUSES = ["new", "categorized", "assigned", "en_route", "done"];
+const STATUS_LABELS: Record<string, string> = {
+  new: "New",
+  categorized: "Categorized",
+  assigned: "Assigned",
+  en_route: "En Route",
+  done: "Done",
+};
 
 export default function CustomerTrackingPage(): React.ReactElement {
   const { jobId } = useParams<{ jobId: string }>();
-  const [job, setJob] = useState<JobStatus | null>(null);
+  const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const parsedId = Number(jobId);
-    if (!jobId || !Number.isInteger(parsedId) || parsedId <= 0) {
+    if (!jobId || !Number.isFinite(parsedId) || parsedId <= 0) {
       setLoading(false);
-      setError("Invalid job id in the URL.");
+      setError("Invalid job ID in the URL.");
       return;
     }
 
     let mounted = true;
     setLoading(true);
     setError(null);
-    setNotFound(false);
 
-    getJobStatus(parsedId)
+    getJobById(parsedId)
       .then((data) => {
         if (!mounted) return;
         setJob(data);
       })
       .catch((err) => {
         if (!mounted) return;
-        if (err instanceof JobNotFoundError) {
-          setNotFound(true);
+        if (err instanceof ApiError && err.status === 404) {
+          setError(`No job found with ID #${jobId}.`);
         } else {
           setError(err instanceof Error ? err.message : "Something went wrong.");
         }
@@ -50,60 +55,121 @@ export default function CustomerTrackingPage(): React.ReactElement {
     };
   }, [jobId]);
 
+  const currentIndex = job ? STATUSES.indexOf(job.status) : -1;
+
   return (
-    <div className="page-container">
-      <div className="page-card">
-        <h1>Track Your Job</h1>
-        <p className="subtitle">Follow the progress of your service request.</p>
+    <div className="max-w-2xl mx-auto px-4 md:px-8 py-8">
+      <h1 className="text-2xl font-bold text-slate-900">Track Your Job</h1>
+      <p className="mt-1 text-sm text-slate-500">
+        Follow the progress of your service request.
+      </p>
 
-        {loading && <p className="placeholder">Loading job status...</p>}
+      {loading && (
+        <p className="mt-8 text-sm text-slate-500">Loading job status…</p>
+      )}
 
-        {!loading && notFound && (
-          <div className="form-alert form-alert--error" role="alert">
-            We couldn&apos;t find a job with id #{jobId}. Please check the link
-            from your confirmation.
-          </div>
-        )}
+      {!loading && error && (
+        <div className="mt-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+          <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-500" />
+          <span>{error}</span>
+        </div>
+      )}
 
-        {!loading && error && (
-          <div className="form-alert form-alert--error" role="alert">
-            Could not load job status: {error}
-          </div>
-        )}
-
-        {!loading && job && (
-          <>
-            <div className="tracking-summary">
-              <div className="tracking-summary-head">
-                <span className="tracking-job-id">Job #{job.job_id}</span>
-                <StatusBadge status={job.status} />
-              </div>
-
-              <dl className="tracking-details">
-                <div className="tracking-detail">
-                  <dt>Service</dt>
-                  <dd>{job.service ?? "Not categorized yet"}</dd>
-                </div>
-                <div className="tracking-detail">
-                  <dt>Technician</dt>
-                  <dd>
-                    {job.technician
-                      ? `${job.technician.name} (${job.technician.status})`
-                      : "Not assigned yet"}
-                  </dd>
-                </div>
-                <div className="tracking-detail">
-                  <dt>ETA</dt>
-                  <dd>{job.eta_message ?? "No ETA available yet"}</dd>
-                </div>
-              </dl>
+      {!loading && job && (
+        <div className="mt-6 space-y-6">
+          {/* Status timeline */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between">
+              {STATUSES.map((status, i) => {
+                const completed = i < currentIndex;
+                const current = i === currentIndex;
+                const circleClass = completed
+                  ? "bg-green-500 text-white"
+                  : current
+                  ? "bg-blue-600 text-white"
+                  : "bg-slate-200 text-slate-400";
+                return (
+                  <div
+                    key={status}
+                    className="flex-1 flex flex-col items-center relative"
+                  >
+                    {i > 0 && (
+                      <span
+                        className={`absolute top-4 right-1/2 w-full h-0.5 ${
+                          i <= currentIndex ? "bg-green-500" : "bg-slate-200"
+                        }`}
+                      />
+                    )}
+                    <div
+                      className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center ${circleClass}`}
+                    >
+                      {completed ? (
+                        <CheckCircle2 size={18} />
+                      ) : current ? (
+                        <Clock size={16} />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-current" />
+                      )}
+                    </div>
+                    <span
+                      className={`mt-2 text-xs text-center ${
+                        current
+                          ? "font-semibold text-slate-900"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      {STATUS_LABELS[status] ?? status}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
-            <h2>Progress</h2>
-            <StatusTimeline status={job.status} />
-          </>
-        )}
-      </div>
+          {/* Job summary */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Job #{job.id}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {job.service_name ?? "Not categorized yet"}
+                </p>
+              </div>
+              <StatusBadge status={job.status} />
+            </div>
+            {job.eta_message && (
+              <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+                <Clock size={16} className="text-blue-500" />
+                <span>{job.eta_message}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Technician */}
+          {job.technician ? (
+            <div className="bg-white border border-slate-200 rounded-2xl p-6">
+              <h3 className="text-sm font-semibold text-slate-700 mb-2">
+                Your Technician
+              </h3>
+              <p className="text-base font-semibold text-slate-900">
+                {job.technician.name}
+              </p>
+              <p className="text-xs text-slate-500 capitalize mt-0.5">
+                {job.technician.status.replace("_", " ")}
+              </p>
+            </div>
+          ) : (
+            job.status !== "done" && (
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 text-sm text-slate-500">
+                A dispatcher is reviewing your job and will assign a technician
+                shortly.
+              </div>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 }

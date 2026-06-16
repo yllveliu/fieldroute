@@ -1,23 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle, AlertTriangle, AlertCircle } from "lucide-react";
-import type { DispatcherJob } from "../../services/dispatcherApi";
-import type { Technician } from "../../services/techniciansApi";
-import { fetchTechnicians } from "../../services/techniciansApi";
-import { fetchParts } from "../../services/partsApi";
+import type { DispatcherJob } from "../../api/dispatcher";
+import type { Technician } from "../../api/technicians";
+import { getTechnicians } from "../../api/technicians";
+import { getParts } from "../../api/parts";
+import type { Part } from "../../api/parts";
 import { assignJob } from "../../api/jobs";
 import { ApiError } from "../../api/client";
 
 type ConflictType = "technician_unavailable" | "insufficient_stock" | null;
-
-interface Part {
-  id: number;
-  name: string;
-  sku: string;
-  stock_quantity: number;
-  reserved_qty: number;
-  low_stock_threshold?: number;
-}
 
 export interface AssignmentModalProps {
   job: DispatcherJob;
@@ -66,12 +58,16 @@ export default function AssignmentModal({
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([fetchTechnicians(), fetchParts()]).then(([techs, ps]) => {
-      if (!mounted) return;
-      setTechnicians(techs);
-      setParts(ps as Part[]);
-      setLoadingData(false);
-    });
+    Promise.all([getTechnicians(), getParts()])
+      .then(([techs, ps]) => {
+        if (!mounted) return;
+        setTechnicians(techs);
+        setParts(ps);
+        setLoadingData(false);
+      })
+      .catch(() => {
+        if (mounted) setLoadingData(false);
+      });
     return () => {
       mounted = false;
     };

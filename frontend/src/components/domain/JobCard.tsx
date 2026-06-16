@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronUp, UserPlus } from 'lucide-react'
+import { ChevronDown, ChevronUp, UserPlus, BrainCircuit } from 'lucide-react'
 import { StatusBadge } from '@/components/primitives'
 import { getStatusConfig } from '@/data'
 import type { JobDetail } from '@/api'
@@ -8,9 +8,11 @@ import type { JobDetail } from '@/api'
 interface JobCardProps {
   job: JobDetail
   onAssign?: (jobId: number) => void
+  onClassify?: () => void
+  classifying?: boolean
 }
 
-export function JobCard({ job, onAssign }: JobCardProps) {
+export function JobCard({ job, onAssign, onClassify, classifying = false }: JobCardProps) {
   const [expanded, setExpanded] = useState(false)
   const config = getStatusConfig(job.status)
 
@@ -46,6 +48,19 @@ export function JobCard({ job, onAssign }: JobCardProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 shrink-0">
+          {job.status === 'new' && onClassify && (
+            <button
+              onClick={onClassify}
+              disabled={classifying}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg
+                bg-violet-600 text-white text-xs font-medium
+                hover:bg-violet-700 disabled:opacity-60
+                transition-colors duration-150"
+            >
+              <BrainCircuit size={12} />
+              {classifying ? 'Classifying…' : 'Classify'}
+            </button>
+          )}
           {job.status === 'categorized' && onAssign && (
             <button
               onClick={() => onAssign(job.id)}
