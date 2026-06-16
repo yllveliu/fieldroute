@@ -1052,6 +1052,157 @@ body {
   }
 }
 
+/* ── Technicians Page ────────────────────────────────────────────── */
+
+.tech-page {
+  width: 100%;
+}
+
+.tech-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.tech-page-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0066cc;
+  margin-bottom: 0.25rem;
+}
+
+.tech-page-subtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Filter card */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.25rem;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #64748b;
+  min-width: 5.5rem;
+  flex-shrink: 0;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filter-chip {
+  padding: 0.3rem 0.875rem;
+  border-radius: 20px;
+  border: 1.5px solid #cbd5e1;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  line-height: 1.5;
+}
+
+.filter-chip:hover:not(.filter-chip--active) {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.filter-chip--active {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+}
+
+.filter-chip--active:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Result count */
+.tech-result-count {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+/* Technician grid */
+.technician-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.875rem;
+}
+
+/* Empty state */
+.technician-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.technician-empty-icon {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.technician-empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.35rem;
+}
+
+.technician-empty-sub {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  .tech-page-title {
+    font-size: 1.35rem;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filter-label {
+    min-width: auto;
+  }
+
+  .technician-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════════
    COMPREHENSIVE RESPONSIVE OVERRIDES
    768px → standard mobile   480px → small mobile   360px → tiny
