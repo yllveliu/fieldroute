@@ -50,6 +50,27 @@ export async function getJobById(id: number): Promise<JobDetail> {
   return apiGet<JobDetail>(`/jobs/${id}`)
 }
 
+export interface JobTrackingResponse {
+  id:               number
+  status:           string
+  service_name:     string
+  customer_name:    string
+  eta_message:      string | null
+  ai_service_type:  string | null
+  ai_confidence:    number | null
+  ai_explanation:   string | null
+  technician?: {
+    id:     number
+    name:   string
+    skills: string[]
+    status: string
+  } | null
+}
+
+export async function getJob(id: number): Promise<JobTrackingResponse> {
+  return apiGet<JobTrackingResponse>(`/jobs/${id}`)
+}
+
 export async function classifyJob(id: number): Promise<ClassifyResult> {
   return apiPost<ClassifyResult>(`/jobs/${id}/classify`)
 }

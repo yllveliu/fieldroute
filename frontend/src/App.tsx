@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout";
 import HomePage from "./pages/HomePage";
 import CustomerPage from "./pages/CustomerPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
+import TrackingPage from "./pages/TrackingPage";
 import DispatcherPage from "./pages/DispatcherPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import InventoryPage from "./pages/InventoryPage";
@@ -17,6 +18,7 @@ export default function App(): React.ReactElement {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/customer" element={<CustomerPage />} />
+          <Route path="/track" element={<TrackingPage />} />
           <Route
             path="/customer/tracking/:jobId"
             element={<CustomerTrackingPage />}
