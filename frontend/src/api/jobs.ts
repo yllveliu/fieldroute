@@ -77,12 +77,15 @@ export async function classifyJob(id: number): Promise<ClassifyResult> {
 
 export interface AssignJobRequest {
   technician_id: number
+  part_ids?: number[]
 }
 
 export interface AssignJobResponse {
   job_id: number
   technician_id: number
-  status: string
+  new_job_status: string
+  new_technician_status: string
+  reserved_part_ids: number[]
 }
 
 export async function assignJob(

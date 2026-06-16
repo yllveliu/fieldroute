@@ -10,7 +10,7 @@ export interface Technician {
 
 export async function getTechnicians(status?: string): Promise<Technician[]> {
   const query = status ? `?status=${encodeURIComponent(status)}` : ''
-  return apiGet<Technician[]>(`/technicians${query}`)
+  return apiGet<Technician[]>(`/technicians/${query}`)
 }
 
 export async function getTechnicianById(id: number): Promise<Technician> {

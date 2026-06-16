@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { getDispatcherJobs, mockDispatcherJobs } from '@/api'
+import { getDispatcherJobs, classifyJob, mockDispatcherJobs } from '@/api'
 import type { DispatcherJob, JobDetail } from '@/api'
 import { PageHeader } from '@/components/layout'
 import { StatCard, EmptyState, Toast } from '@/components/primitives'
+import type { ToastVariant } from '@/components/primitives'
 import { JobCard } from '@/components/domain'
 import AssignmentModal from '@/components/assignment/AssignmentModal'
 
@@ -38,8 +39,10 @@ export default function DispatcherPage() {
   const [offline, setOffline]           = useState(false)
   const [filter, setFilter]             = useState<string>('all')
   const [search, setSearch]             = useState('')
-  const [assigningJob, setAssigningJob] = useState<DispatcherJob | null>(null)
-  const [toastMsg, setToastMsg]         = useState<string | null>(null)
+  const [assigningJob, setAssigningJob]   = useState<DispatcherJob | null>(null)
+  const [classifyingId, setClassifyingId]   = useState<number | null>(null)
+  const [toastMsg, setToastMsg]             = useState<string | null>(null)
+  const [toastVariant, setToastVariant]     = useState<ToastVariant>('success')
 
   useEffect(() => {
     getDispatcherJobs()
@@ -83,6 +86,21 @@ export default function DispatcherPage() {
       .catch(() => {})
   }
 
+  async function handleClassify(job: DispatcherJob) {
+    setClassifyingId(job.id)
+    try {
+      await classifyJob(job.id)
+      setToastVariant('success')
+      setToastMsg(`Job #${job.id} classified successfully.`)
+      refresh()
+    } catch {
+      setToastVariant('error')
+      setToastMsg(`Failed to classify Job #${job.id}.`)
+    } finally {
+      setClassifyingId(null)
+    }
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
       <PageHeader
@@ -123,7 +141,7 @@ export default function DispatcherPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search jobs…"
-          className="ml-auto px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ml-auto flex-1 min-w-[180px] max-w-xs px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -141,10 +159,16 @@ export default function DispatcherPage() {
               key={job.id}
               job={toJobDetail(job)}
               onAssign={
-                ['new', 'categorized'].includes(job.status)
+                job.status === 'categorized'
                   ? () => setAssigningJob(job)
                   : undefined
               }
+              onClassify={
+                job.status === 'new' && !offline
+                  ? () => handleClassify(job)
+                  : undefined
+              }
+              classifying={classifyingId === job.id}
             />
           ))}
         </div>
@@ -157,6 +181,7 @@ export default function DispatcherPage() {
           onClose={() => setAssigningJob(null)}
           onSuccess={msg => {
             setAssigningJob(null)
+            setToastVariant('success')
             setToastMsg(msg)
             refresh()
           }}
@@ -166,7 +191,7 @@ export default function DispatcherPage() {
       {/* Toast */}
       <Toast
         message={toastMsg ?? ''}
-        variant="success"
+        variant={toastVariant}
         visible={Boolean(toastMsg)}
         onClose={() => setToastMsg(null)}
       />

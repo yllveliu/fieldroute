@@ -6,4 +6,6 @@ COPY ./app ./app
 # Alembic config + migration scripts, so `alembic upgrade head` runs in-container.
 COPY alembic.ini ./alembic.ini
 COPY ./alembic ./alembic
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY start.sh ./start.sh
+RUN chmod +x start.sh
+CMD ["./start.sh"]
