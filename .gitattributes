@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings so they run inside Linux containers.
+# Without this, Windows autocrlf rewrites them to CRLF and the shebang breaks
+# ("exec ./start.sh: no such file or directory").
+*.sh text eol=lf
