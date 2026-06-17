@@ -25,3 +25,11 @@ class LoginResponse(BaseModel):
     token_type: str
     user_id: int
     role: str
+
+
+class CurrentUserResponse(BaseModel):
+    user_id: int
+    email: str
+    role: str
+
+    model_config = {"from_attributes": True}

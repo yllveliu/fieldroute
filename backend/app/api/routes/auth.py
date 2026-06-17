@@ -7,11 +7,13 @@ from sqlalchemy import select
 from app.db.session import get_db
 from app.models.user import User
 from app.core.security import hash_password, verify_password, create_access_token
+from app.core.dependencies import get_current_user
 from app.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
     LoginRequest,
     LoginResponse,
+    CurrentUserResponse,
 )
 
 router = APIRouter()
@@ -84,4 +86,17 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         token_type="bearer",
         user_id=user.id,
         role=user.role,
+    )
+
+
+@router.get(
+    "/me",
+    response_model=CurrentUserResponse,
+    summary="Return the currently authenticated user",
+)
+def get_me(current_user: User = Depends(get_current_user)):
+    return CurrentUserResponse(
+        user_id=current_user.id,
+        email=current_user.email,
+        role=current_user.role,
     )
