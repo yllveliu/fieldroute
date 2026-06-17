@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.dependencies import require_role
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.classify import ClassifyResponse
 from app.schemas.job import (
     JobDetailResponse,
@@ -51,7 +53,11 @@ def get_job_status(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{job_id}/classify", response_model=ClassifyResponse)
-def classify_job(job_id: int, db: Session = Depends(get_db)):
+def classify_job(
+    job_id: int,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("dispatcher")),
+):
     """Classify a new job using keyword-based AI classification rules."""
     job = get_job(db, job_id)
     if job is None:

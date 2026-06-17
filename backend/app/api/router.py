@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.core.dependencies import require_role
 from .routes import ai
 from .routes import debug
 from .routes import health
@@ -15,10 +16,28 @@ api_router = APIRouter()
 # Mount health check route at root; more routers (customers, etc.) can be added later
 api_router.include_router(health.router)
 api_router.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
-api_router.include_router(parts.router, prefix="/parts", tags=["parts"])
-api_router.include_router(dispatcher.router, prefix="/dispatcher", tags=["dispatcher"])
-api_router.include_router(debug.router, prefix="/debug", tags=["debug"])
-api_router.include_router(technicians.router, prefix="/technicians", tags=["technicians"])
-api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
-api_router.include_router(assignment.router, prefix="/jobs", tags=["jobs"])
+api_router.include_router(
+    parts.router, prefix="/parts", tags=["parts"],
+    dependencies=[Depends(require_role("dispatcher"))],
+)
+api_router.include_router(
+    dispatcher.router, prefix="/dispatcher", tags=["dispatcher"],
+    dependencies=[Depends(require_role("dispatcher"))],
+)
+api_router.include_router(
+    debug.router, prefix="/debug", tags=["debug"],
+    dependencies=[Depends(require_role("dispatcher"))],
+)
+api_router.include_router(
+    technicians.router, prefix="/technicians", tags=["technicians"],
+    dependencies=[Depends(require_role("dispatcher", "technician"))],
+)
+api_router.include_router(
+    ai.router, prefix="/ai", tags=["ai"],
+    dependencies=[Depends(require_role("dispatcher"))],
+)
+api_router.include_router(
+    assignment.router, prefix="/jobs", tags=["jobs"],
+    dependencies=[Depends(require_role("dispatcher"))],
+)
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
