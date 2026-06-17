@@ -5,3 +5,6 @@ psycopg[binary]
 alembic
 psycopg2-binary
 anthropic
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==4.0.1

@@ -9,3 +9,8 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql+psycopg://fieldroute:fieldroute@db:5432/fieldroute",
 )
+
+# JWT settings
+SECRET_KEY = os.getenv("SECRET_KEY", "fieldroute-dev-secret-change-in-production")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
