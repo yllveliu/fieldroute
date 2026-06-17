@@ -6,8 +6,8 @@ from pydantic import BaseModel
 class TechnicianResponse(BaseModel):
     id: int
     name: str
-    skills: Optional[List[str]] = None
+    skills: List[str]
     status: str
+    current_job: Optional[int] = None  # active job id if assigned, else null
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}

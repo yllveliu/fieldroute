@@ -1,5 +1,5 @@
 import React from "react";
-import { Technician } from "../../services/techniciansApi";
+import type { Technician } from "../../api/technicians";
 import SkillBadge from "./SkillBadge";
 import StatusBadge from "./StatusBadge";
 

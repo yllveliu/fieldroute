@@ -2,13 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.schemas.classify import ClassifyResponse
 from app.schemas.job import (
+    JobDetailResponse,
     JobRequestCreate,
     JobRequestResponse,
     JobStatusResponse,
     JobTechnicianStatus,
+    TechnicianSummary,
 )
-from app.services.job_service import create_job_request, get_job
+from app.services.job_service import classify_problem, create_job_request, get_job
 
 router = APIRouter()
 
@@ -44,4 +47,64 @@ def get_job_status(job_id: int, db: Session = Depends(get_db)):
         eta_message=job.eta_message,
         service=job.service.name if job.service is not None else None,
         technician=technician,
+    )
+
+
+@router.post("/{job_id}/classify", response_model=ClassifyResponse)
+def classify_job(job_id: int, db: Session = Depends(get_db)):
+    """Classify a new job using keyword-based AI classification rules."""
+    job = get_job(db, job_id)
+    if job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+
+    if job.status != "new":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Job must be in 'new' status to classify. Current status: {job.status}",
+        )
+
+    classification = classify_problem(job.raw_description)
+    previous_status = job.status
+    job.ai_service_type = classification["service_type"]
+    job.ai_confidence = classification["confidence"]
+    job.ai_explanation = classification["explanation"]
+    job.status = "categorized"
+    db.commit()
+    db.refresh(job)
+
+    return ClassifyResponse(
+        job_id=job.id,
+        previous_status=previous_status,
+        new_status=job.status,
+        ai_service_type=job.ai_service_type,
+        ai_confidence=job.ai_confidence,
+        ai_explanation=job.ai_explanation,
+    )
+
+
+@router.get("/{job_id}", response_model=JobDetailResponse)
+def get_job_detail(job_id: int, db: Session = Depends(get_db)):
+    """Return the rich detail for a single job."""
+    job = get_job(db, job_id)
+    if job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+
+    technician = None
+    if job.technician is not None:
+        technician = TechnicianSummary(
+            id=job.technician.id,
+            name=job.technician.name,
+            status=job.technician.status,
+        )
+
+    return JobDetailResponse(
+        id=job.id,
+        status=job.status,
+        service_name=job.service.name if job.service is not None else None,
+        problem_description=job.raw_description,
+        eta_message=job.eta_message,
+        technician=technician,
+        ai_service_type=job.ai_service_type,
+        ai_confidence=job.ai_confidence,
+        ai_explanation=job.ai_explanation,
     )

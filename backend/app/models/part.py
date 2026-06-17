@@ -18,6 +18,9 @@ class Part(Base):
     sku: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     stock_quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     reserved_qty: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    low_stock_threshold: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="5", default=5
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

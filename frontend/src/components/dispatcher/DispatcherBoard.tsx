@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import JobCard from "./JobCard";
 import AssignmentModal from "../assignment/AssignmentModal";
+import { Toast } from "../primitives/Toast";
 import type { DispatcherJob } from "../../services/dispatcherApi";
 
 interface SummaryCardProps {
@@ -42,6 +44,13 @@ interface DispatcherBoardProps {
 
 export default function DispatcherBoard({ jobs }: DispatcherBoardProps): React.ReactElement {
   const [assigningJob, setAssigningJob] = useState<DispatcherJob | null>(null);
+  const [toast, setToast] = useState<{ message: string; key: number } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(id);
+  }, [toast]);
 
   const countByStatus = (statuses: string[]) =>
     jobs.filter((j) => statuses.includes(j.status.toLowerCase())).length;
@@ -118,12 +127,22 @@ export default function DispatcherBoard({ jobs }: DispatcherBoardProps): React.R
         })}
       </div>
 
-      {assigningJob && (
-        <AssignmentModal
-          job={assigningJob}
-          onClose={() => setAssigningJob(null)}
-        />
-      )}
+      <AnimatePresence>
+        {assigningJob && (
+          <AssignmentModal
+            job={assigningJob}
+            onClose={() => setAssigningJob(null)}
+            onSuccess={(msg) => setToast({ message: msg, key: Date.now() })}
+          />
+        )}
+      </AnimatePresence>
+
+      <Toast
+        message={toast?.message ?? ""}
+        variant="success"
+        visible={toast !== null}
+        onClose={() => setToast(null)}
+      />
     </div>
   );
 }

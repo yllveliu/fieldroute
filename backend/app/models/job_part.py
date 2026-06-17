@@ -17,6 +17,7 @@ class JobPart(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     part_id: Mapped[int] = mapped_column(ForeignKey("parts.id"), nullable=False)
     qty_needed: Mapped[int] = mapped_column(Integer, nullable=False)
+    qty_used: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     job: Mapped["Job"] = relationship("Job", back_populates="job_parts")
     part: Mapped["Part"] = relationship("Part", back_populates="job_parts")

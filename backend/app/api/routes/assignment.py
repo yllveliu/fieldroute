@@ -1,50 +1,28 @@
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.assignment import AssignJobRequest, AssignmentGateResponse
-from app.schemas.errors import ConflictResponse
-from app.services.assignment_service import prepare_assignment_gate
+from app.schemas.assign import AssignRequest, AssignResponse
+from app.services.assignment_service import assign_job
 
 router = APIRouter()
 
 
 @router.post(
     "/{job_id}/assign",
-    response_model=AssignmentGateResponse,
+    response_model=AssignResponse,
     status_code=status.HTTP_200_OK,
-    responses={
-        status.HTTP_409_CONFLICT: {"model": ConflictResponse},
-    },
-    summary="Prepare an assignment gate preview for a job",
+    summary="Assign a categorized job to a technician",
 )
-def assign_job(
+def assign_job_endpoint(
     job_id: int,
-    payload: AssignJobRequest,
+    payload: AssignRequest,
     db: Session = Depends(get_db),
-) -> AssignmentGateResponse:
-    """Endpoint to prepare an assignment gate for a job.
-
-    This Sprint 1 endpoint returns a safe placeholder response that proves the
-    route and service shape are ready for Sprint 2. It does not mutate database
-    state or perform locking.
-    """
-
-    # Call the service skeleton which returns a preview response.
+) -> AssignResponse:
+    """Assign a job to a technician and reserve optional parts atomically."""
     try:
-        preview = prepare_assignment_gate(
-            db=db,
-            job_id=job_id,
-            technician_id=payload.technician_id,
-            required_parts=[p.dict() for p in payload.required_parts],
-            eta_message=payload.eta_message,
-        )
-        return preview
+        return assign_job(db=db, job_id=job_id, technician_id=payload.technician_id, part_ids=payload.part_ids)
     except HTTPException:
-        # Re-raise HTTPExceptions so they are handled normally
         raise
     except Exception as exc:  # pragma: no cover - keep generic guard
-        # Unexpected errors => 500
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
