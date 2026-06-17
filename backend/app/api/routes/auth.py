@@ -1,11 +1,18 @@
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from app.db.session import get_db
 from app.models.user import User
-from app.core.security import hash_password
-from app.schemas.auth import RegisterRequest, RegisterResponse
+from app.core.security import hash_password, verify_password, create_access_token
+from app.schemas.auth import (
+    RegisterRequest,
+    RegisterResponse,
+    LoginRequest,
+    LoginResponse,
+)
 
 router = APIRouter()
 
@@ -43,4 +50,38 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         email=new_user.email,
         role=new_user.role,
         message="Account created successfully.",
+    )
+
+
+@router.post(
+    "/login",
+    response_model=LoginResponse,
+    summary="Log in and receive a JWT access token",
+)
+def login(payload: LoginRequest, db: Session = Depends(get_db)):
+    # Look up the user by email
+    user = db.execute(
+        select(User).where(User.email == payload.email)
+    ).scalar_one_or_none()
+
+    # Use the same generic error for both wrong email and wrong password.
+    # This prevents attackers from knowing whether an email is registered.
+    if user is None or not verify_password(payload.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Issue a JWT token valid for 24 hours, as specified for this task.
+    token = create_access_token(
+        data={"sub": user.email, "role": user.role, "user_id": user.id},
+        expires_delta=timedelta(hours=24),
+    )
+
+    return LoginResponse(
+        access_token=token,
+        token_type="bearer",
+        user_id=user.id,
+        role=user.role,
     )
