@@ -8,6 +8,7 @@ from .routes import parts
 from .routes import dispatcher
 from .routes import technicians
 from .routes import assignment
+from .routes import auth
 
 api_router = APIRouter()
 
@@ -20,3 +21,4 @@ api_router.include_router(debug.router, prefix="/debug", tags=["debug"])
 api_router.include_router(technicians.router, prefix="/technicians", tags=["technicians"])
 api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
 api_router.include_router(assignment.router, prefix="/jobs", tags=["jobs"])
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
