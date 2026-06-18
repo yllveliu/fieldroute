@@ -8,6 +8,7 @@ from .routes import jobs
 from .routes import parts
 from .routes import dispatcher
 from .routes import technicians
+from .routes import technician_jobs
 from .routes import assignment
 from .routes import auth
 
@@ -39,5 +40,11 @@ api_router.include_router(
 api_router.include_router(
     assignment.router, prefix="/jobs", tags=["jobs"],
     dependencies=[Depends(require_role("dispatcher"))],
+)
+api_router.include_router(
+    technician_jobs.router,
+    prefix="/technician/jobs",
+    tags=["technician"],
+    dependencies=[Depends(require_role("technician"))],
 )
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
