@@ -1,7 +1,8 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Zap } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LogOut, Zap } from 'lucide-react'
 import { NAV_ITEMS } from './navItems'
+import { useAuth } from '@/context/AuthContext'
 
 interface SidebarProps {
   collapsed: boolean
@@ -9,6 +10,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+  const { isAuth, logout } = useAuth()
+  const navigate = useNavigate()
+
   return (
     <motion.aside
       animate={{ width: collapsed ? 64 : 220 }}
@@ -48,6 +52,20 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </NavLink>
         ))}
       </nav>
+
+      {/* Sign out */}
+      {isAuth && (
+        <button
+          onClick={() => {
+            logout()
+            navigate('/login')
+          }}
+          className="flex items-center gap-3 mx-2 mb-1 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+        >
+          <LogOut className="w-5 h-5 flex-shrink-0" />
+          {!collapsed && <span className="truncate">Sign Out</span>}
+        </button>
+      )}
 
       {/* Collapse toggle */}
       <button
