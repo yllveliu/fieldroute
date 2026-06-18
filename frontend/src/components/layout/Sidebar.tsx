@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, LogOut, Zap } from 'lucide-react'
-import { NAV_ITEMS } from './navItems'
+import { visibleNavItems } from './navItems'
 import { useAuth } from '@/context/AuthContext'
 
 interface SidebarProps {
@@ -10,8 +10,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const { isAuth, logout } = useAuth()
+  const { isAuth, user, logout } = useAuth()
   const navigate = useNavigate()
+  const navItems = visibleNavItems(user?.role)
 
   return (
     <motion.aside
@@ -33,7 +34,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Nav items */}
       <nav className="flex-1 flex flex-col gap-1 px-2 py-2">
-        {NAV_ITEMS.map(({ label, path, icon: Icon }) => (
+        {navItems.map(({ label, path, icon: Icon }) => (
           <NavLink
             key={path}
             to={path}

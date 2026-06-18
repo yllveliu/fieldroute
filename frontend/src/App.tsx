@@ -11,6 +11,7 @@ import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import InventoryPage from "./pages/InventoryPage";
 import TechniciansPage from "./pages/TechniciansPage";
+import TechnicianJobPage from "./pages/TechnicianJobPage";
 import AIPage from "./pages/AIPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -50,6 +51,14 @@ export default function App(): React.ReactElement {
             element={
               <ProtectedRoute>
                 <TechniciansPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/technician/job"
+            element={
+              <ProtectedRoute requiredRole="technician">
+                <TechnicianJobPage />
               </ProtectedRoute>
             }
           />
