@@ -52,3 +52,16 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   }
   return res.json() as Promise<T>
 }
+
+export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'PATCH',
+    headers: authHeaders(true),
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }))
+    throw new ApiError(res.status, err.detail ?? res.statusText)
+  }
+  return res.json() as Promise<T>
+}
