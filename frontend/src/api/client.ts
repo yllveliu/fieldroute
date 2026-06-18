@@ -10,8 +10,29 @@ export class ApiError extends Error {
   }
 }
 
+// Read the JWT from localStorage on each request so the API client stays in
+// sync with AuthContext without a circular import.
+function getToken(): string | null {
+  return localStorage.getItem('fr_token')
+}
+
+// Build request headers, attaching the Authorization header when a token exists.
+function authHeaders(withJson: boolean): Record<string, string> {
+  const headers: Record<string, string> = {}
+  if (withJson) {
+    headers['Content-Type'] = 'application/json'
+  }
+  const token = getToken()
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+  return headers
+}
+
 export async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`)
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: authHeaders(false),
+  })
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }))
     throw new ApiError(res.status, body.detail ?? res.statusText)
@@ -22,7 +43,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(true),
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
   if (!res.ok) {

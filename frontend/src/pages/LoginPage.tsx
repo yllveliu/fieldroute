@@ -3,21 +3,30 @@ import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { LogIn, AlertCircle } from 'lucide-react'
-import { login, ApiError } from '@/api'
+import { login as loginApi, ApiError } from '@/api'
+import { useAuth } from '@/context/AuthContext'
 
 export default function LoginPage() {
   const [form, setForm]             = useState({ email: '', password: '' })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState<string | null>(null)
   const navigate                    = useNavigate()
+  const { login }                   = useAuth()
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setSubmitting(true)
     try {
-      const res = await login(form)
-      localStorage.setItem('fr_token', res.access_token)
+      const res = await loginApi(form)
+      // Backend login returns a flat shape ({ access_token, user_id, role });
+      // it has no name/email, so derive the AuthUser from the response + form.
+      login(res.access_token, {
+        id:    res.user_id,
+        email: form.email,
+        name:  form.email,
+        role:  res.role,
+      })
       navigate('/dispatcher')
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 401) {
