@@ -16,3 +16,19 @@ export interface LoginResponse {
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   return apiPost<LoginResponse>('/auth/login', data)
 }
+
+export interface RegisterRequest {
+  name:     string
+  email:    string
+  password: string
+  role:     'dispatcher' | 'technician'
+}
+
+export interface RegisterResponse {
+  user_id: number
+  role:    'dispatcher' | 'technician'
+}
+
+export async function register(data: RegisterRequest): Promise<RegisterResponse> {
+  return apiPost<RegisterResponse>('/auth/register', data)
+}

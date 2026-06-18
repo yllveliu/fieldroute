@@ -7,6 +7,7 @@ import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import TrackingPage from "./pages/TrackingPage";
 import DispatcherPage from "./pages/DispatcherPage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import InventoryPage from "./pages/InventoryPage";
 import TechniciansPage from "./pages/TechniciansPage";
@@ -18,6 +19,7 @@ export default function App(): React.ReactElement {
       <Routes>
         {/* Standalone — no AppLayout (no sidebar / top bar) */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/customer" element={<CustomerPage />} />
