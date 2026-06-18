@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import require_role
+from .routes import admin
 from .routes import ai
 from .routes import debug
 from .routes import health
@@ -15,6 +16,7 @@ api_router = APIRouter()
 
 # Mount health check route at root; more routers (customers, etc.) can be added later
 api_router.include_router(health.router)
+api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
 api_router.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
 api_router.include_router(
     parts.router, prefix="/parts", tags=["parts"],
