@@ -14,6 +14,7 @@ import TechniciansPage from "./pages/TechniciansPage";
 import TechnicianJobPage from "./pages/TechnicianJobPage";
 import AIPage from "./pages/AIPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import AdminConsolePage from "./pages/AdminConsolePage";
 
 export default function App(): React.ReactElement {
   return (
@@ -63,6 +64,14 @@ export default function App(): React.ReactElement {
             }
           />
           <Route path="/ai" element={<AIPage />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="dispatcher">
+                <AdminConsolePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
