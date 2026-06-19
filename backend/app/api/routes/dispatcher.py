@@ -4,11 +4,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from app.core.dependencies import get_current_user
 from app.db.session import get_db
 from app.models.job import Job
+from app.models.user import User
 from app.schemas.dispatcher import DispatcherJobItem
 from app.schemas.job import JobDetailResponse, TechnicianSummary
 from app.schemas.status_update import StatusUpdateRequest
+from app.services.audit import log_job_event
 from app.services.job_service import get_job
 
 router = APIRouter()
@@ -78,6 +81,7 @@ def update_job_status(
     job_id: int,
     body: StatusUpdateRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     job = get_job(db, job_id)
     if job is None:
@@ -96,5 +100,6 @@ def update_job_status(
         job.technician.status = "available"
         job.technician_id = None
 
+    log_job_event(db, job_id, current, requested, current_user.id)
     db.commit()
     return _to_job_detail(get_job(db, job_id))

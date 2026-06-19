@@ -8,9 +8,10 @@ from app.models.job import Job
 from app.models.part import Part
 from app.models.technician import Technician
 from app.schemas.assign import AssignResponse
+from app.services.audit import log_job_event
 
 
-def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]) -> AssignResponse:
+def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int], changed_by: int | None = None) -> AssignResponse:
     """Assign a job to a technician and reserve requested parts atomically."""
 
     job = db.get(Job, job_id)
@@ -50,6 +51,7 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
             parts.append(part)
 
     # All validation checks passed; perform writes in a single commit.
+    previous_status = job.status
     job.technician_id = technician.id
     job.status = "assigned"
     technician.status = "on_job"
@@ -60,6 +62,7 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
         part.reserved_qty += increment
         reserved_part_ids.append(part.id)
 
+    log_job_event(db, job_id, previous_status, "assigned", changed_by)
     db.commit()
     db.refresh(job)
     db.refresh(technician)

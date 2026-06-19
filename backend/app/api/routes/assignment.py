@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.dependencies import get_current_user
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.assign import AssignRequest, AssignResponse
 from app.services.assignment_service import assign_job
 
@@ -18,10 +20,11 @@ def assign_job_endpoint(
     job_id: int,
     payload: AssignRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> AssignResponse:
     """Assign a job to a technician and reserve optional parts atomically."""
     try:
-        return assign_job(db=db, job_id=job_id, technician_id=payload.technician_id, part_ids=payload.part_ids)
+        return assign_job(db=db, job_id=job_id, technician_id=payload.technician_id, part_ids=payload.part_ids, changed_by=current_user.id)
     except HTTPException:
         raise
     except Exception as exc:  # pragma: no cover - keep generic guard
