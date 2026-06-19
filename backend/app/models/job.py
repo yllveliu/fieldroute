@@ -8,6 +8,7 @@ from app.db.session import Base
 
 if TYPE_CHECKING:
     from app.models.customer import Customer
+    from app.models.job_event import JobEvent
     from app.models.job_part import JobPart
     from app.models.service import Service
     from app.models.technician import Technician
@@ -34,3 +35,4 @@ class Job(Base):
     service: Mapped["Service | None"] = relationship("Service", back_populates="jobs")
     technician: Mapped["Technician | None"] = relationship("Technician", back_populates="jobs")
     job_parts: Mapped[list["JobPart"]] = relationship("JobPart", back_populates="job")
+    events: Mapped[list["JobEvent"]] = relationship("JobEvent", back_populates="job")

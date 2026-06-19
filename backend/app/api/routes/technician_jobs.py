@@ -5,10 +5,13 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
 
+from app.core.dependencies import get_current_user
 from app.db.session import get_db
 from app.models.job import Job
 from app.models.job_part import JobPart
+from app.models.user import User
 from app.schemas.job import JobDetailResponse, TechnicianSummary
+from app.services.audit import log_job_event
 
 router = APIRouter()
 
@@ -54,6 +57,7 @@ def update_technician_job_status(
     job_id: int,
     body: TechnicianJobStatusUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     # Load job with all relationships needed for response serialisation and completion logic.
     stmt = (
@@ -80,6 +84,7 @@ def update_technician_job_status(
             ),
         )
 
+    previous_status = job.status
     job.status = body.status
 
     if body.status == "done":
@@ -94,6 +99,7 @@ def update_technician_job_status(
                 0, job_part.part.reserved_qty - job_part.qty_needed
             )
 
+    log_job_event(db, job_id, previous_status, body.status, current_user.id)
     db.commit()
     db.refresh(job)
 

@@ -13,6 +13,7 @@ from app.schemas.job import (
     JobTechnicianStatus,
     TechnicianSummary,
 )
+from app.services.audit import log_job_event
 from app.services.job_service import classify_problem, create_job_request, get_job
 
 router = APIRouter()
@@ -56,7 +57,7 @@ def get_job_status(job_id: int, db: Session = Depends(get_db)):
 def classify_job(
     job_id: int,
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("dispatcher")),
+    current_user: User = Depends(require_role("dispatcher")),
 ):
     """Classify a new job using keyword-based AI classification rules."""
     job = get_job(db, job_id)
@@ -75,6 +76,7 @@ def classify_job(
     job.ai_confidence = classification["confidence"]
     job.ai_explanation = classification["explanation"]
     job.status = "categorized"
+    log_job_event(db, job.id, previous_status, "categorized", current_user.id)
     db.commit()
     db.refresh(job)
 
