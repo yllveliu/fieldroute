@@ -65,3 +65,16 @@ export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   }
   return res.json() as Promise<T>
 }
+
+export async function apiDelete<T = void>(path: string): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'DELETE',
+    headers: authHeaders(false),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }))
+    throw new ApiError(res.status, err.detail ?? res.statusText)
+  }
+  if (res.status === 204) return undefined as T
+  return res.json() as Promise<T>
+}
