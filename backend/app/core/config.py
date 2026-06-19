@@ -22,3 +22,7 @@ SMTP_USER = os.getenv("SMTP_USER", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("SMTP_FROM", "noreply@fieldroute.com")
 NOTIFICATION_EMAIL = os.getenv("NOTIFICATION_EMAIL", "")
+# Claude AI classification (KAN-67). Loaded from the environment only — never
+# hardcode or log this value. Empty by default so the classify endpoint falls
+# back to the KAN-31 keyword classifier when no key is configured.
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
