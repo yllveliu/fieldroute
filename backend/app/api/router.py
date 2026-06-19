@@ -11,6 +11,7 @@ from .routes import dispatcher
 from .routes import technicians
 from .routes import technician_jobs
 from .routes import assignment
+from .routes import analytics
 from .routes import auth
 
 api_router = APIRouter()
@@ -48,5 +49,9 @@ api_router.include_router(
     prefix="/technician/jobs",
     tags=["technician"],
     dependencies=[Depends(require_role("technician"))],
+)
+api_router.include_router(
+    analytics.router, prefix="/dispatcher/analytics", tags=["dispatcher"],
+    dependencies=[Depends(require_role("dispatcher"))],
 )
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
