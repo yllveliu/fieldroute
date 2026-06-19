@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -13,10 +15,16 @@ from app.schemas.job import (
     JobTechnicianStatus,
     TechnicianSummary,
 )
+from app.services.ai_classifier import classify_with_claude
 from app.services.audit import log_job_event
 from app.services.job_service import classify_problem, create_job_request, get_job
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
+
+# Used when the keyword fallback runs (it has no eta of its own).
+_FALLBACK_ETA = "A technician will follow up to schedule a visit."
 
 
 @router.post("", response_model=JobRequestResponse, status_code=status.HTTP_201_CREATED)
@@ -59,7 +67,7 @@ def classify_job(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("dispatcher")),
 ):
-    """Classify a new job using keyword-based AI classification rules."""
+    """Classify a new job with Claude, falling back to keyword rules on failure."""
     job = get_job(db, job_id)
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
@@ -70,11 +78,29 @@ def classify_job(
             detail=f"Job must be in 'new' status to classify. Current status: {job.status}",
         )
 
-    classification = classify_problem(job.raw_description)
+    # Prefer Claude; on missing key, API error, timeout, or any other failure,
+    # fall back to the KAN-31 keyword classifier so this endpoint never breaks.
+    try:
+        classification = classify_with_claude(job.raw_description)
+        eta = classification["eta"]
+    except Exception as exc:  # noqa: BLE001 — endpoint must never break
+        logger.warning(
+            "Claude classification failed (%s); falling back to keyword classifier",
+            type(exc).__name__,
+        )
+        fallback = classify_problem(job.raw_description)
+        classification = {
+            "service_type": fallback["service_type"],
+            "confidence": fallback["confidence"],
+            "explanation": fallback["explanation"],
+        }
+        eta = _FALLBACK_ETA
+
     previous_status = job.status
     job.ai_service_type = classification["service_type"]
     job.ai_confidence = classification["confidence"]
     job.ai_explanation = classification["explanation"]
+    job.eta_message = eta
     job.status = "categorized"
     log_job_event(db, job.id, previous_status, "categorized", current_user.id)
     db.commit()
@@ -87,6 +113,7 @@ def classify_job(
         ai_service_type=job.ai_service_type,
         ai_confidence=job.ai_confidence,
         ai_explanation=job.ai_explanation,
+        eta=job.eta_message,
     )
 
 
