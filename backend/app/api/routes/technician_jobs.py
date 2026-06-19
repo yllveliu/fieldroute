@@ -7,11 +7,13 @@ from sqlalchemy import select
 
 from app.core.dependencies import get_current_user
 from app.db.session import get_db
+from app.models.customer import Customer
 from app.models.job import Job
 from app.models.job_part import JobPart
 from app.models.user import User
 from app.schemas.job import JobDetailResponse, TechnicianSummary
 from app.services.audit import log_job_event
+from app.services.email_service import notify_job_completed
 
 router = APIRouter()
 
@@ -66,6 +68,7 @@ def update_technician_job_status(
         .options(
             selectinload(Job.technician),
             selectinload(Job.service),
+            selectinload(Job.customer),
             selectinload(Job.job_parts).selectinload(JobPart.part),
         )
     )
@@ -102,5 +105,14 @@ def update_technician_job_status(
     log_job_event(db, job_id, previous_status, body.status, current_user.id)
     db.commit()
     db.refresh(job)
+
+    if body.status == "done":
+        customer_name = job.customer.name if job.customer is not None else "Customer"
+        tech_name = job.technician.name if job.technician is not None else "Technician"
+        notify_job_completed(
+            job_id=job.id,
+            customer_name=customer_name,
+            technician_name=tech_name,
+        )
 
     return _build_response(job)
