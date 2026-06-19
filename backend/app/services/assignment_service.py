@@ -4,11 +4,13 @@ from typing import List
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.models.customer import Customer
 from app.models.job import Job
 from app.models.part import Part
 from app.models.technician import Technician
 from app.schemas.assign import AssignResponse
 from app.services.audit import log_job_event
+from app.services.email_service import notify_job_assigned
 
 
 def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int], changed_by: int | None = None) -> AssignResponse:
@@ -66,6 +68,15 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
     db.commit()
     db.refresh(job)
     db.refresh(technician)
+
+    customer = db.get(Customer, job.customer_id)
+    customer_name = customer.name if customer is not None else "Customer"
+    notify_job_assigned(
+        job_id=job.id,
+        customer_name=customer_name,
+        technician_name=technician.name,
+        eta_message=job.eta_message,
+    )
 
     return AssignResponse(
         job_id=job.id,
