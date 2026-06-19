@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Truck, Wrench, Package, Briefcase, Sparkles, ClipboardCheck, ShieldCheck, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Users, Truck, Wrench, Package, Briefcase, Sparkles, ClipboardCheck, ShieldCheck, BarChart2, type LucideIcon } from 'lucide-react'
 import type { AuthUser } from '@/context/AuthContext'
 
 export interface NavItem {
@@ -19,6 +19,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Inventory',   path: '/inventory',      icon: Package                                },
   { label: 'Customers',   path: '/customer',       icon: Users                                  },
   { label: 'AI',          path: '/ai',             icon: Sparkles                               },
+  { label: 'Analytics',   path: '/analytics',      icon: BarChart2,      role: 'dispatcher'       },
   { label: 'Admin',       path: '/admin',          icon: ShieldCheck,    role: 'dispatcher'       },
 ]
 

@@ -12,6 +12,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/inventory':   'Inventory',
   '/customer':    'Customers',
   '/ai':          'AI Classification',
+  '/analytics':   'Analytics',
   '/admin':       'Admin Console',
 }
 
