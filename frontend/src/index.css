@@ -56,6 +56,7 @@
   /* ── Brand colors ── */
   --fr-primary:        #2563EB;
   --fr-primary-hover:  #1D4ED8;
+  --fr-primary-dark:   #1E3A8A;
   --fr-secondary:      #1E40AF;
   --fr-accent:         #06B6D4;
   --fr-accent-hover:   #0891B2;
@@ -72,12 +73,15 @@
 
   /* ── Neutrals ── */
   --fr-dark:           #0F172A;
+  --fr-text:           #0F172A;
   --fr-surface:        #F8FAFC;
   --fr-surface-raised: #FFFFFF;
+  --fr-surface-elevated: #FFFFFF;
   --fr-border:         #E2E8F0;
   --fr-border-strong:  #CBD5E1;
   --fr-muted:          #64748B;
   --fr-muted-light:    #94A3B8;
+  --fr-text-muted:     #94A3B8;
 
   /* ── Status badge colors ── */
   --fr-status-new:         #6366F1;
