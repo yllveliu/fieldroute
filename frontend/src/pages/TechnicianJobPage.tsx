@@ -12,6 +12,8 @@ import { useAuth } from '@/context/AuthContext'
 import { PageHeader } from '@/components/layout'
 import { EmptyState, Toast, type ToastVariant } from '@/components/primitives'
 import { JobCard, Timeline } from '@/components/domain'
+import { PageSkeleton } from '@/components/ui/Skeleton'
+import { PageError } from '@/components/ui/PageError'
 
 export default function TechnicianJobPage() {
   const { user } = useAuth()
@@ -106,16 +108,9 @@ export default function TechnicianJobPage() {
       )}
 
       {loading ? (
-        <p className="text-slate-500 mt-8 text-sm">Loading your job…</p>
+        <PageSkeleton variant="cards" count={2} />
       ) : error ? (
-        <div className="mt-4">
-          <EmptyState
-            icon={ClipboardList}
-            title="Could not load your job"
-            description={error}
-            action={{ label: 'Retry', onClick: () => void load() }}
-          />
-        </div>
+        <PageError message={error} onRetry={load} />
       ) : !job ? (
         <div className="mt-4">
           <EmptyState

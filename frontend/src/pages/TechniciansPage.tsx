@@ -4,6 +4,8 @@ import { getTechnicians } from "../api/technicians";
 import type { Technician } from "../api/technicians";
 import TechnicianCard from "../components/technicians/TechnicianCard";
 import { getSkillConfig } from "../data/skillConfig";
+import { PageSkeleton } from "../components/ui/Skeleton";
+import { PageError } from "../components/ui/PageError";
 
 const SKILL_CHIPS = ["Plumbing", "Electrical", "HVAC", "Carpentry"] as const;
 
@@ -26,21 +28,21 @@ export default function TechniciansPage(): React.ReactElement {
   const [activeSkill, setActiveSkill] = useState<string | null>(null);
   const [activeStatus, setActiveStatus] = useState("");
 
+  const fetchTechnicians = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getTechnicians();
+      setTechnicians(data);
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let mounted = true;
-    getTechnicians()
-      .then((data) => {
-        if (!mounted) return;
-        setTechnicians(data);
-      })
-      .catch((err) => {
-        if (!mounted) return;
-        setError(String(err));
-      })
-      .finally(() => mounted && setLoading(false));
-    return () => {
-      mounted = false;
-    };
+    void fetchTechnicians();
   }, []);
 
   const filtered = technicians.filter((t) => {
@@ -103,16 +105,10 @@ export default function TechniciansPage(): React.ReactElement {
       </div>
 
       {/* ── States ── */}
-      {loading && (
-        <p className="placeholder" style={{ paddingTop: "2rem" }}>
-          Loading technicians…
-        </p>
-      )}
+      {loading && <PageSkeleton variant="list" count={4} />}
 
       {!loading && error && (
-        <p style={{ color: "#c0392b", paddingTop: "2rem" }}>
-          Error loading technicians: {error}
-        </p>
+        <PageError message={error} onRetry={fetchTechnicians} />
       )}
 
       {!loading && !error && filtered.length === 0 && (
