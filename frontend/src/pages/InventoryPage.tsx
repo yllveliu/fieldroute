@@ -31,7 +31,7 @@ export default function InventoryPage() {
     )
 
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 overflow-x-hidden">
       <PageHeader
         title="Inventory"
         subtitle="Monitor parts stock levels and identify low-stock items."
@@ -43,7 +43,7 @@ export default function InventoryPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by name or SKU…"
-          className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border border-slate-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer select-none">
           <input

@@ -99,14 +99,14 @@ export default function TrackingPage() {
   const currentIndex = job ? STATUSES.indexOf(job.status) : -1
 
   return (
-    <div className="max-w-2xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-2xl mx-auto px-4 md:px-8 py-8 overflow-x-hidden">
       <PageHeader
         title="Track Your Job"
         subtitle="Enter your job ID to see real-time status updates."
       />
 
       {/* Lookup bar */}
-      <div className="flex gap-3 mt-6">
+      <div className="flex flex-col md:flex-row gap-3 mt-6">
         <div className="relative flex-1">
           <Search
             size={16}
@@ -118,13 +118,13 @@ export default function TrackingPage() {
             onKeyDown={e => e.key === 'Enter' && handleFind()}
             placeholder="Enter Job ID (e.g. 1)"
             className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300
-              text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <button
           onClick={handleFind}
           disabled={loading}
-          className="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm
+          className="px-5 py-2.5 min-h-[44px] rounded-xl bg-blue-600 text-white text-base
             font-semibold hover:bg-blue-700 disabled:opacity-60 transition-colors"
         >
           {loading ? 'Finding…' : 'Find'}
@@ -149,7 +149,7 @@ export default function TrackingPage() {
         >
           {/* Status timeline */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               {STATUSES.map((status, i) => {
                 const config = getStatusConfig(status)
                 const completed = i < currentIndex

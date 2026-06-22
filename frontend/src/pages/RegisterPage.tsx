@@ -42,11 +42,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 overflow-x-hidden">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-sm"
+        className="w-full max-w-md mx-auto px-4"
       >
         {/* Logo / brand */}
         <div className="text-center mb-8">
@@ -77,7 +77,7 @@ export default function RegisterPage() {
                 value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Jane Smith"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
@@ -92,7 +92,7 @@ export default function RegisterPage() {
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 placeholder="you@example.com"
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
             </div>
 
@@ -107,7 +107,7 @@ export default function RegisterPage() {
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="Min. 8 characters"
-                className={`w-full px-4 py-2.5 rounded-xl bg-slate-800 border text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${passwordError ? 'border-red-500' : 'border-slate-700'}`}
+                className={`w-full px-4 py-2.5 rounded-xl bg-slate-800 border text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition ${passwordError ? 'border-red-500' : 'border-slate-700'}`}
               />
               {passwordError && (
                 <p className="text-red-400 text-xs mt-1">{passwordError}</p>
@@ -125,7 +125,7 @@ export default function RegisterPage() {
                     key={r}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, role: r }))}
-                    className={`py-2.5 rounded-xl text-sm font-medium border transition-colors capitalize ${
+                    className={`py-2.5 min-h-[44px] rounded-xl text-base font-medium border transition-colors capitalize ${
                       form.role === r
                         ? 'bg-blue-600 border-blue-600 text-white'
                         : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
@@ -141,7 +141,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3 min-h-[44px] rounded-xl bg-blue-600 text-white font-semibold text-base hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 mt-2"
             >
               {submitting
                 ? <><span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Creating account…</>

@@ -73,7 +73,7 @@ export default function HomePage() {
   ).length
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
 
       {/* ── Section 1: Hero ─────────────────────────────────────────── */}
       <section
@@ -102,13 +102,13 @@ export default function HomePage() {
           <div className="flex gap-3 justify-center mt-8 flex-wrap">
             <button
               onClick={() => navigate('/dispatcher')}
-              className="px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-xl flex items-center gap-2 transition-colors"
+              className="w-full md:w-auto min-h-[44px] px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors"
             >
               Go to Dispatcher <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => navigate('/jobs')}
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 flex items-center gap-2 transition-colors"
+              className="w-full md:w-auto min-h-[44px] px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 flex items-center justify-center gap-2 transition-colors"
             >
               Track a Job
             </button>
@@ -118,7 +118,7 @@ export default function HomePage() {
 
       {/* ── Section 2: Stats ────────────────────────────────────────── */}
       <section className="bg-white border-b border-slate-200">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 px-4 md:px-8 max-w-5xl mx-auto pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-10 px-4 md:px-8 max-w-5xl mx-auto pb-10">
           <StatCard title="Total Jobs"      value={totalJobs}      icon={Briefcase}     />
           <StatCard title="Active Jobs"     value={activeJobs}     icon={Users}         trend="up" />
           <StatCard title="Available Techs" value={availableTechs} icon={Package}       trend="neutral" />
