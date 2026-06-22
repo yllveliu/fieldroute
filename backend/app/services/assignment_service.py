@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models.customer import Customer
 from app.models.job import Job
+from app.models.job_part import JobPart
 from app.models.part import Part
 from app.models.technician import Technician
 from app.schemas.assign import AssignResponse
@@ -72,6 +73,10 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
     for part in parts:
         increment = part_counts[part.id]
         part.reserved_qty += increment
+        # Persist the job→part link so the reservation can be released (and
+        # qty_used recorded) when the job is completed. Without this row the
+        # reserved stock would leak permanently.
+        db.add(JobPart(job_id=job.id, part_id=part.id, qty_needed=increment))
         reserved_part_ids.append(part.id)
 
     log_job_event(db, job_id, previous_status, "assigned", changed_by)
