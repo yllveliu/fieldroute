@@ -52,7 +52,7 @@ export function JobCard({ job, onAssign, onClassify, classifying = false }: JobC
             <button
               onClick={onClassify}
               disabled={classifying}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] rounded-lg
                 bg-violet-600 text-white text-xs font-medium
                 hover:bg-violet-700 disabled:opacity-60
                 transition-colors duration-150"
@@ -64,7 +64,7 @@ export function JobCard({ job, onAssign, onClassify, classifying = false }: JobC
           {job.status === 'categorized' && onAssign && (
             <button
               onClick={() => onAssign(job.id)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg
+              className="flex items-center gap-1 px-3 py-1.5 min-h-[44px] rounded-lg
                 bg-blue-600 text-white text-xs font-medium
                 hover:bg-blue-700 transition-colors duration-150"
             >
@@ -75,7 +75,7 @@ export function JobCard({ job, onAssign, onClassify, classifying = false }: JobC
           {job.problem_description && (
             <button
               onClick={() => setExpanded(e => !e)}
-              className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100
+              className="p-1.5 min-h-[44px] min-w-[44px] rounded-lg text-slate-400 hover:bg-slate-100
                 transition-colors"
               aria-label={expanded ? 'Collapse' : 'Expand'}
             >

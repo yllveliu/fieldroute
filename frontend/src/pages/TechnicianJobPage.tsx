@@ -92,7 +92,7 @@ export default function TechnicianJobPage() {
   const canDone = job?.status === 'en_route'
 
   return (
-    <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-3xl mx-auto px-4 md:px-8 py-8 overflow-x-hidden">
       <PageHeader
         title="My Job"
         subtitle="Your current assignment. Update its status as you work."

@@ -14,7 +14,7 @@ export function MobileNav() {
           to={path}
           end={path === '/'}
           className={({ isActive }) =>
-            `relative flex-1 flex flex-col items-center justify-center py-2 gap-0.5
+            `relative flex-1 flex flex-col items-center justify-center py-2 gap-0.5 min-h-[44px]
              text-xs font-medium transition-colors duration-150
              ${isActive ? 'text-blue-600' : 'text-slate-500'}`
           }

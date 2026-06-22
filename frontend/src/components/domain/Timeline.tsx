@@ -20,7 +20,7 @@ export function Timeline({ currentStatus }: TimelineProps) {
   const activeIndex = STEPS.indexOf(currentStatus as Step)
 
   return (
-    <div className="relative flex items-start">
+    <div className="relative flex flex-col md:flex-row items-start">
       {STEPS.map((step, i) => {
         const isCompleted = isCancelled ? false : i < activeIndex
         const isActive    = !isCancelled && i === activeIndex

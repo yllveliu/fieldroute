@@ -102,7 +102,7 @@ export default function DispatcherPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 overflow-x-hidden">
       <PageHeader
         title="Dispatcher Dashboard"
         subtitle="Manage incoming jobs, assign technicians, and track field operations."
@@ -130,8 +130,8 @@ export default function DispatcherPage() {
             onClick={() => setFilter(opt.value)}
             className={
               filter === opt.value
-                ? 'px-3 py-1 rounded-full text-xs font-semibold bg-blue-600 text-white'
-                : 'px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'px-3 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-blue-600 text-white'
+                : 'px-3 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200'
             }
           >
             {opt.label}
@@ -141,7 +141,7 @@ export default function DispatcherPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search jobs…"
-          className="ml-auto flex-1 min-w-[180px] max-w-xs px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ml-auto flex-1 min-w-[180px] max-w-xs px-3 py-1.5 rounded-lg border border-slate-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
