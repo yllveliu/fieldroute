@@ -2,6 +2,7 @@ from collections import Counter
 from typing import List
 
 from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.customer import Customer
@@ -16,7 +17,9 @@ from app.services.email_service import notify_job_assigned
 def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int], changed_by: int | None = None) -> AssignResponse:
     """Assign a job to a technician and reserve requested parts atomically."""
 
-    job = db.get(Job, job_id)
+    job = db.execute(
+        select(Job).where(Job.id == job_id).with_for_update()
+    ).scalar_one_or_none()
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
 
@@ -26,7 +29,9 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
             detail=f"Job must be categorized before assignment. Current status: {job.status}",
         )
 
-    technician = db.get(Technician, technician_id)
+    technician = db.execute(
+        select(Technician).where(Technician.id == technician_id).with_for_update()
+    ).scalar_one_or_none()
     if technician is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Technician not found")
 
@@ -36,7 +41,12 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
     part_counts = Counter(part_ids)
     parts: List[Part] = []
     if part_counts:
-        queried_parts = db.query(Part).filter(Part.id.in_(part_counts.keys())).all()
+        queried_parts = db.execute(
+            select(Part)
+            .where(Part.id.in_(part_counts.keys()))
+            .order_by(Part.id)
+            .with_for_update()
+        ).scalars().all()
         found_ids = {part.id for part in queried_parts}
         for part_id in part_counts:
             if part_id not in found_ids:
