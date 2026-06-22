@@ -4,9 +4,10 @@ import {
   Send, CheckCircle, AlertCircle, BrainCircuit,
   Truck, ClipboardList,
 } from 'lucide-react'
-import { createJob, ApiError } from '@/api'
+import { createJob, getMe, ApiError } from '@/api'
 import type { CreateJobResponse } from '@/api'
 import { PageHeader } from '@/components/layout'
+import { useAuth } from '@/context/AuthContext'
 
 const PLACEHOLDERS = [
   'e.g. Burst pipe under kitchen sink…',
@@ -51,7 +52,22 @@ const EMPTY_FORM = {
 }
 
 export default function CustomerPage() {
+  const { user } = useAuth()
+  const isTechnician = user?.role === 'technician'
   const [form, setForm] = useState(EMPTY_FORM)
+
+  // For a technician requesting a service, prefill their name from their account
+  // so they don't retype it (phone/address aren't on file, so stay editable).
+  useEffect(() => {
+    if (!isTechnician) return
+    let active = true
+    getMe()
+      .then((me) => {
+        if (active && me.name) setForm((f) => ({ ...f, customer_name: me.name as string }))
+      })
+      .catch(() => { /* leave form blank on failure */ })
+    return () => { active = false }
+  }, [isTechnician])
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState<CreateJobResponse | null>(null)
   const [error, setError] = useState<string | null>(null)

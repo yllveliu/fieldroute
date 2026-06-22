@@ -36,3 +36,55 @@ def decode_access_token(token: str) -> Optional[dict]:
         return payload
     except JWTError:
         return None
+
+
+def _reset_secret(password_hash: str) -> str:
+    """Per-user signing secret for password-reset tokens.
+
+    Mixing in the current password hash makes a reset token single-use: once the
+    password is changed the hash changes, so any previously issued token (and any
+    duplicate) stops verifying. No extra table needed.
+    """
+    return f"{SECRET_KEY}:{password_hash}"
+
+
+def create_password_reset_token(user_id: int, password_hash: str) -> str:
+    """Create a short-lived (1 hour) single-use password-reset token."""
+    expire = datetime.now(timezone.utc) + timedelta(hours=1)
+    return jwt.encode(
+        {"sub": str(user_id), "purpose": "password_reset", "exp": expire},
+        _reset_secret(password_hash),
+        algorithm=ALGORITHM,
+    )
+
+
+def unverified_reset_user_id(token: str) -> Optional[int]:
+    """Read the user id from a reset token WITHOUT verifying the signature.
+
+    Used only to locate the user so their current password hash can be fetched
+    to perform the real verification in ``verify_password_reset_token``.
+    """
+    try:
+        claims = jwt.get_unverified_claims(token)
+    except JWTError:
+        return None
+    sub = claims.get("sub")
+    try:
+        return int(sub) if sub is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def verify_password_reset_token(token: str, password_hash: str) -> Optional[int]:
+    """Verify a reset token against the user's current hash. Returns the user id
+    or None if the token is invalid, expired, already used, or for another user."""
+    try:
+        payload = jwt.decode(
+            token, _reset_secret(password_hash), algorithms=[ALGORITHM]
+        )
+    except JWTError:
+        return None
+    if payload.get("purpose") != "password_reset":
+        return None
+    sub = payload.get("sub")
+    return int(sub) if sub is not None else None

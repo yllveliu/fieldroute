@@ -21,6 +21,11 @@ class Job(Base):
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False)
     service_id: Mapped[int | None] = mapped_column(ForeignKey("services.id"), nullable=True)
     technician_id: Mapped[int | None] = mapped_column(ForeignKey("technicians.id"), nullable=True)
+    # The technician who *requested* this job for themselves (if any). Used to
+    # keep them out of the assignable-technician list for their own request.
+    requested_by_technician_id: Mapped[int | None] = mapped_column(
+        ForeignKey("technicians.id"), nullable=True
+    )
     raw_description: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String, nullable=False, default="new")
     eta_message: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -33,6 +38,8 @@ class Job(Base):
 
     customer: Mapped["Customer"] = relationship("Customer", back_populates="jobs")
     service: Mapped["Service | None"] = relationship("Service", back_populates="jobs")
-    technician: Mapped["Technician | None"] = relationship("Technician", back_populates="jobs")
+    technician: Mapped["Technician | None"] = relationship(
+        "Technician", foreign_keys=[technician_id], back_populates="jobs"
+    )
     job_parts: Mapped[list["JobPart"]] = relationship("JobPart", back_populates="job")
     events: Mapped[list["JobEvent"]] = relationship("JobEvent", back_populates="job")

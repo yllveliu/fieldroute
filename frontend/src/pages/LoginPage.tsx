@@ -4,7 +4,19 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { LogIn, AlertCircle } from 'lucide-react'
 import { login as loginApi, ApiError } from '@/api'
+import type { Role, ApplicationStatus } from '@/api'
 import { useAuth } from '@/context/AuthContext'
+
+// Where each role lands after signing in.
+function landingFor(role: Role, status: ApplicationStatus | null): string {
+  switch (role) {
+    case 'admin':      return '/'
+    case 'dispatcher': return '/dispatcher'
+    case 'technician': return status === 'approved' ? '/technician/job' : '/application-status'
+    case 'customer':   return '/customer'
+    default:           return '/'
+  }
+}
 
 export default function LoginPage() {
   const [form, setForm]             = useState({ email: '', password: '' })
@@ -19,15 +31,17 @@ export default function LoginPage() {
     setSubmitting(true)
     try {
       const res = await loginApi(form)
-      // Backend login returns a flat shape ({ access_token, user_id, role });
-      // it has no name/email, so derive the AuthUser from the response + form.
+      // Backend login returns a flat shape ({ access_token, user_id, role,
+      // application_status }); it has no name/email, so derive the AuthUser
+      // from the response + form.
       login(res.access_token, {
         id:    res.user_id,
         email: form.email,
         name:  form.email,
         role:  res.role,
+        applicationStatus: res.application_status,
       })
-      navigate('/dispatcher')
+      navigate(landingFor(res.role, res.application_status))
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Invalid email or password. Please try again.')
@@ -94,6 +108,11 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               />
+              <div className="text-right mt-1">
+                <a href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                  Forgot password?
+                </a>
+              </div>
             </div>
 
             {/* Submit */}

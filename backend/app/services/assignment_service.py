@@ -39,6 +39,13 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
     if technician.status != "available":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="TECHNICIAN_UNAVAILABLE")
 
+    # A technician cannot be assigned to a job they requested for themselves.
+    if job.requested_by_technician_id == technician.id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A technician cannot be assigned to their own service request.",
+        )
+
     part_counts = Counter(part_ids)
     parts: List[Part] = []
     if part_counts:
@@ -86,11 +93,15 @@ def assign_job(db: Session, job_id: int, technician_id: int, part_ids: List[int]
 
     customer = db.get(Customer, job.customer_id)
     customer_name = customer.name if customer is not None else "Customer"
+    # Email the technician directly when their login account is linked; otherwise
+    # notify_job_assigned falls back to the operations inbox.
+    technician_email = technician.user.email if technician.user is not None else None
     notify_job_assigned(
         job_id=job.id,
         customer_name=customer_name,
         technician_name=technician.name,
         eta_message=job.eta_message,
+        technician_email=technician_email,
     )
 
     return AssignResponse(
