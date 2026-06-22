@@ -1,30 +1,33 @@
-import { LayoutDashboard, Users, Truck, Wrench, Package, Briefcase, Sparkles, ClipboardCheck, ShieldCheck, BarChart2, type LucideIcon } from 'lucide-react'
-import type { AuthUser } from '@/context/AuthContext'
+import { LayoutDashboard, Truck, Wrench, Package, Sparkles, ClipboardCheck, ShieldCheck, FileText, Users, MapPin, type LucideIcon } from 'lucide-react'
+import type { Role } from '@/context/AuthContext'
 
 export interface NavItem {
   label: string
   path: string
   icon: LucideIcon
-  // When set, the item only shows for users with this role. Items without a
-  // role are visible to everyone (unchanged behaviour).
-  role?: AuthUser['role']
+  // Roles allowed to see the item. Omit to show for every logged-in user.
+  roles?: Role[]
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',   path: '/',               icon: LayoutDashboard                       },
-  { label: 'Dispatcher',  path: '/dispatcher',     icon: Truck                                 },
-  { label: 'Technicians', path: '/technicians',    icon: Wrench                                 },
-  { label: 'My Job',      path: '/technician/job', icon: ClipboardCheck, role: 'technician'    },
-  { label: 'Jobs',        path: '/jobs',           icon: Briefcase                              },
-  { label: 'Inventory',   path: '/inventory',      icon: Package                                },
-  { label: 'Customers',   path: '/customer',       icon: Users                                  },
-  { label: 'AI',          path: '/ai',             icon: Sparkles                               },
-  { label: 'Analytics',   path: '/analytics',      icon: BarChart2,      role: 'dispatcher'       },
-  { label: 'Admin',       path: '/admin',          icon: ShieldCheck,    role: 'dispatcher'       },
+  // Admin
+  { label: 'Dashboard',    path: '/',                   icon: LayoutDashboard, roles: ['admin']      },
+  { label: 'Applications', path: '/admin/applications', icon: FileText,        roles: ['admin']      },
+  { label: 'Admin',        path: '/admin',              icon: ShieldCheck,     roles: ['admin']      },
+  // Dispatcher
+  { label: 'Dispatcher',   path: '/dispatcher',         icon: Truck,           roles: ['dispatcher'] },
+  { label: 'Technicians',  path: '/technicians',        icon: Wrench,          roles: ['dispatcher'] },
+  { label: 'AI',           path: '/ai',                 icon: Sparkles,        roles: ['dispatcher'] },
+  // Technician
+  { label: 'My Job',       path: '/technician/job',     icon: ClipboardCheck,  roles: ['technician'] },
+  { label: 'Inventory',    path: '/inventory',          icon: Package,         roles: ['technician'] },
+  // Customer (technicians can also request/track services with their own account)
+  { label: 'New Request',  path: '/customer',           icon: Users,           roles: ['customer', 'technician'] },
+  { label: 'Track',        path: '/track',              icon: MapPin,          roles: ['customer', 'technician'] },
 ]
 
-// Items visible to the given user. Role-less items always show; role-gated
-// items show only when the user's role matches.
-export function visibleNavItems(role: AuthUser['role'] | undefined): NavItem[] {
-  return NAV_ITEMS.filter((item) => !item.role || item.role === role)
+// Items visible to the given role. Role-less items always show; role-gated
+// items show only when the user's role is in the allowed list.
+export function visibleNavItems(role: Role | undefined): NavItem[] {
+  return NAV_ITEMS.filter((item) => !item.roles || (role !== undefined && item.roles.includes(role)))
 }

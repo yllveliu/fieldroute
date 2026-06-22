@@ -15,6 +15,10 @@ SECRET_KEY = os.getenv("SECRET_KEY", "fieldroute-dev-secret-change-in-production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
+# Public base URL of the frontend, used to build links in emails
+# (e.g. the password-reset link). No trailing slash.
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
 # Email / SMTP settings
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))

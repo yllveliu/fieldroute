@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import require_role
+from app.core.dependencies import get_current_user_optional, require_role
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.classify import ClassifyResponse
@@ -18,6 +18,7 @@ from app.schemas.job import (
 from app.services.ai_classifier import classify_with_claude
 from app.services.audit import log_job_event
 from app.services.job_service import classify_problem, create_job_request, get_job
+from app.services.skill_matching import required_skills_for
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +27,51 @@ router = APIRouter()
 # Used when the keyword fallback runs (it has no eta of its own).
 _FALLBACK_ETA = "A technician will follow up to schedule a visit."
 
+def _detect_required_skills(description: str) -> set[str]:
+    """Detect which company skill(s) a free-text request needs.
+
+    Uses the Claude classifier, falling back to the keyword classifier on any
+    failure, then maps the detected service category onto company skills.
+    """
+    try:
+        service_type = classify_with_claude(description)["service_type"]
+    except Exception:  # noqa: BLE001 — fall back, never break submission
+        service_type = classify_problem(description)["service_type"]
+    return required_skills_for(service_type)
+
 
 @router.post("", response_model=JobRequestResponse, status_code=status.HTTP_201_CREATED)
-def submit_job_request(payload: JobRequestCreate, db: Session = Depends(get_db)):
-    """Accept a customer service request and persist it as a new job."""
-    job = create_job_request(db, payload)
+def submit_job_request(
+    payload: JobRequestCreate,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional),
+):
+    """Accept a customer service request and persist it as a new job.
+
+    Anyone can submit. When the submitter is a technician, the AI detects the
+    service the request needs and checks it against the technician's own skills:
+    if it's something they provide, the request is rejected. Otherwise the job is
+    tagged as requested by that technician so they won't be offered as its assignee.
+    """
+    requested_by_technician_id: int | None = None
+
+    if current_user is not None and current_user.role == "technician":
+        technician = current_user.technician
+        if technician is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Technician account is incomplete.",
+            )
+        required_skills = _detect_required_skills(payload.raw_description)
+        own_skills = {s.lower() for s in (technician.skills or [])}
+        if required_skills & own_skills:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="The request should be for a service that you as a technician cannot provide.",
+            )
+        requested_by_technician_id = technician.id
+
+    job = create_job_request(db, payload, requested_by_technician_id=requested_by_technician_id)
     return JobRequestResponse(
         job_id=job.id,
         status=job.status,

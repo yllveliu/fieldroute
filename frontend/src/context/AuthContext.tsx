@@ -1,11 +1,16 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
+export type Role = 'customer' | 'technician' | 'dispatcher' | 'admin'
+export type ApplicationStatus = 'pending' | 'approved' | 'rejected'
+
 export interface AuthUser {
   id:    number
   email: string
   name:  string
-  role:  'dispatcher' | 'technician' | 'admin'
+  role:  Role
+  // Only meaningful for technicians; null/undefined for everyone else.
+  applicationStatus?: ApplicationStatus | null
 }
 
 interface AuthContextValue {

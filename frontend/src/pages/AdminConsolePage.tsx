@@ -11,8 +11,14 @@ import {
   adminDeleteTechnician,
   adminCreatePart,
   adminUpdatePart,
+  adminListDispatchers,
+  adminCreateDispatcher,
+  adminDeleteDispatcher,
+  adminUpdateDispatcher,
 } from '@/api/admin'
+import type { StaffListItem } from '@/api/admin'
 import { ApiError } from '@/api'
+import { ShieldCheck } from 'lucide-react'
 import { Toast } from '@/components/primitives/Toast'
 import type { ToastVariant } from '@/components/primitives/Toast'
 import { EmptyState } from '@/components/primitives/EmptyState'
@@ -21,8 +27,16 @@ import { EmptyState } from '@/components/primitives/EmptyState'
 
 interface TechFormState {
   name: string
+  email: string     // only used by the add form (new login account)
+  password: string  // only used by the add form
   skills: string   // comma-separated → parsed to string[] on submit
   status: 'available' | 'on_job' | 'offline'
+}
+
+interface DispatcherFormState {
+  name: string
+  email: string
+  password: string
 }
 
 interface PartAddFormState {
@@ -39,7 +53,8 @@ interface PartEditFormState {
   low_stock_threshold: string
 }
 
-const BLANK_TECH: TechFormState = { name: '', skills: '', status: 'available' }
+const BLANK_TECH: TechFormState = { name: '', email: '', password: '', skills: '', status: 'available' }
+const BLANK_DISPATCHER: DispatcherFormState = { name: '', email: '', password: '' }
 
 function blankPartAdd(): PartAddFormState {
   return { name: '', sku: '', stock_quantity: '0', reserved_qty: '0', low_stock_threshold: '0' }
@@ -48,6 +63,8 @@ function blankPartAdd(): PartAddFormState {
 function techToForm(t: Technician): TechFormState {
   return {
     name: t.name,
+    email: '',      // not editable here
+    password: '',   // not editable here
     skills: t.skills.join(', '),
     status: (t.status as TechFormState['status']) ?? 'available',
   }
@@ -68,12 +85,21 @@ function parseSkills(raw: string): string[] {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AdminConsolePage() {
-  const [tab, setTab] = useState<'technicians' | 'parts'>('technicians')
+  const [tab, setTab] = useState<'technicians' | 'parts' | 'dispatchers'>('technicians')
 
   const [technicians, setTechnicians] = useState<Technician[]>([])
   const [parts, setParts]             = useState<Part[]>([])
+  const [dispatchers, setDispatchers] = useState<StaffListItem[]>([])
   const [loading, setLoading]         = useState(true)
   const [fetchError, setFetchError]   = useState<string | null>(null)
+
+  // Dispatchers UI
+  const [addDispatcherOpen, setAddDispatcherOpen] = useState(false)
+  const [dispatcherForm, setDispatcherForm]       = useState<DispatcherFormState>(BLANK_DISPATCHER)
+  const [submittingDispatcher, setSubmittingDispatcher] = useState(false)
+  const [dispatcherFormError, setDispatcherFormError]   = useState<string | null>(null)
+  const [editDispatcherId, setEditDispatcherId]         = useState<number | null>(null)
+  const [editDispatcherForm, setEditDispatcherForm]     = useState<{ email: string; password: string }>({ email: '', password: '' })
 
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant; visible: boolean }>({
     message: '', variant: 'success', visible: false,
@@ -107,9 +133,12 @@ export default function AdminConsolePage() {
     setLoading(true)
     setFetchError(null)
     try {
-      const [techs, prts] = await Promise.all([getTechnicians(), getParts()])
+      const [techs, prts, disps] = await Promise.all([
+        getTechnicians(), getParts(), adminListDispatchers(),
+      ])
       setTechnicians(techs)
       setParts(prts)
+      setDispatchers(disps)
     } catch {
       setFetchError('Failed to load data. Make sure the backend is running.')
     } finally {
@@ -125,12 +154,16 @@ export default function AdminConsolePage() {
     e.preventDefault()
     setTechFormError(null)
     if (!techForm.name.trim()) { setTechFormError('Name is required.'); return }
+    if (!techForm.email.trim()) { setTechFormError('Email is required.'); return }
+    if (techForm.password.length < 8) { setTechFormError('Password must be at least 8 characters.'); return }
     setSubmittingTech(true)
     try {
       await adminCreateTechnician({
-        name:   techForm.name.trim(),
-        skills: parseSkills(techForm.skills),
-        status: techForm.status,
+        name:     techForm.name.trim(),
+        email:    techForm.email.trim(),
+        password: techForm.password,
+        skills:   parseSkills(techForm.skills),
+        status:   techForm.status,
       })
       setAddTechOpen(false)
       setTechForm(BLANK_TECH)
@@ -171,9 +204,9 @@ export default function AdminConsolePage() {
       await adminDeleteTechnician(id)
       setDeactivateId(null)
       await loadData()
-      showToast('Technician deactivated.', 'success')
+      showToast('Technician deleted.', 'success')
     } catch (err) {
-      showToast(err instanceof ApiError ? err.message : 'Failed to deactivate technician.', 'error')
+      showToast(err instanceof ApiError ? err.message : 'Failed to delete technician.', 'error')
     } finally {
       setSubmittingTech(false)
     }
@@ -229,6 +262,79 @@ export default function AdminConsolePage() {
     }
   }
 
+  // ── Dispatcher handlers ───────────────────────────────────────────────────
+
+  async function handleAddDispatcher(e: FormEvent) {
+    e.preventDefault()
+    setDispatcherFormError(null)
+    if (!dispatcherForm.name.trim() || !dispatcherForm.email.trim()) {
+      setDispatcherFormError('Name and email are required.')
+      return
+    }
+    if (dispatcherForm.password.length < 8) {
+      setDispatcherFormError('Password must be at least 8 characters.')
+      return
+    }
+    setSubmittingDispatcher(true)
+    try {
+      await adminCreateDispatcher({
+        name:     dispatcherForm.name.trim(),
+        email:    dispatcherForm.email.trim(),
+        password: dispatcherForm.password,
+      })
+      setAddDispatcherOpen(false)
+      setDispatcherForm(BLANK_DISPATCHER)
+      await loadData()
+      showToast('Dispatcher created.', 'success')
+    } catch (err) {
+      setDispatcherFormError(err instanceof ApiError ? err.message : 'Failed to create dispatcher.')
+    } finally {
+      setSubmittingDispatcher(false)
+    }
+  }
+
+  async function handleEditDispatcher(e: FormEvent) {
+    e.preventDefault()
+    if (editDispatcherId === null) return
+    setDispatcherFormError(null)
+    const email = editDispatcherForm.email.trim()
+    const password = editDispatcherForm.password
+    if (!email && !password) {
+      setDispatcherFormError('Change the email or set a new password.')
+      return
+    }
+    if (password && password.length < 8) {
+      setDispatcherFormError('Password must be at least 8 characters.')
+      return
+    }
+    setSubmittingDispatcher(true)
+    try {
+      await adminUpdateDispatcher(editDispatcherId, {
+        email: email || undefined,
+        password: password || undefined,
+      })
+      setEditDispatcherId(null)
+      setEditDispatcherForm({ email: '', password: '' })
+      await loadData()
+      showToast('Dispatcher updated.', 'success')
+    } catch (err) {
+      setDispatcherFormError(err instanceof ApiError ? err.message : 'Failed to update dispatcher.')
+    } finally {
+      setSubmittingDispatcher(false)
+    }
+  }
+
+  async function handleDeleteDispatcher(userId: number) {
+    if (!window.confirm('Delete this dispatcher account? This cannot be undone.')) return
+    try {
+      await adminDeleteDispatcher(userId)
+      await loadData()
+      showToast('Dispatcher deleted.', 'success')
+    } catch (err) {
+      showToast(err instanceof ApiError ? err.message : 'Failed to delete dispatcher.', 'error')
+    }
+  }
+
   // ── Shared style constants ────────────────────────────────────────────────
 
   const inputCls = 'px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition'
@@ -253,7 +359,7 @@ export default function AdminConsolePage() {
 
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-slate-200">
-        {(['technicians', 'parts'] as const).map(t => (
+        {(['technicians', 'parts', 'dispatchers'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -263,7 +369,7 @@ export default function AdminConsolePage() {
                 : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            {t === 'technicians' ? <Wrench className="w-4 h-4" /> : <Package className="w-4 h-4" />}
+            {t === 'technicians' ? <Wrench className="w-4 h-4" /> : t === 'parts' ? <Package className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
             {t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
@@ -324,6 +430,22 @@ export default function AdminConsolePage() {
                   placeholder="Full name"
                   value={techForm.name}
                   onChange={e => setTechForm(f => ({ ...f, name: e.target.value }))}
+                  className={`${inputCls} w-full`}
+                />
+                <input
+                  required
+                  type="email"
+                  placeholder="Email (login)"
+                  value={techForm.email}
+                  onChange={e => setTechForm(f => ({ ...f, email: e.target.value }))}
+                  className={`${inputCls} w-full`}
+                />
+                <input
+                  required
+                  type="password"
+                  placeholder="Password (min. 8)"
+                  value={techForm.password}
+                  onChange={e => setTechForm(f => ({ ...f, password: e.target.value }))}
                   className={`${inputCls} w-full`}
                 />
                 <input
@@ -433,7 +555,7 @@ export default function AdminConsolePage() {
                           <td colSpan={5} className="px-4 py-3">
                             <div className="flex items-center justify-between gap-4">
                               <span className="text-sm text-red-700">
-                                Deactivate <strong>{tech.name}</strong>? This cannot be undone.
+                                Permanently delete <strong>{tech.name}</strong> and their login? This cannot be undone.
                               </span>
                               <div className="flex gap-2 shrink-0">
                                 <button
@@ -447,7 +569,7 @@ export default function AdminConsolePage() {
                                   disabled={submittingTech}
                                   className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
                                 >
-                                  {submittingTech ? 'Removing…' : 'Yes, deactivate'}
+                                  {submittingTech ? 'Removing…' : 'Yes, delete'}
                                 </button>
                               </div>
                             </div>
@@ -504,7 +626,7 @@ export default function AdminConsolePage() {
                             <button
                               onClick={() => { setDeactivateId(tech.id); setEditTechId(null) }}
                               className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                              title="Deactivate"
+                              title="Delete"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -721,6 +843,167 @@ export default function AdminConsolePage() {
                               title="Edit stock"
                             >
                               <Pencil className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── DISPATCHERS TAB ─────────────────────────────────────────────── */}
+      {!loading && !fetchError && tab === 'dispatchers' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-500">
+              {dispatchers.length} dispatcher{dispatchers.length !== 1 ? 's' : ''}
+            </span>
+            <button
+              onClick={() => {
+                setAddDispatcherOpen(o => !o)
+                setDispatcherForm(BLANK_DISPATCHER)
+                setDispatcherFormError(null)
+              }}
+              className={`${btnPrimary} flex items-center gap-1.5`}
+            >
+              <Plus className="w-4 h-4" />
+              Add Dispatcher
+            </button>
+          </div>
+
+          {addDispatcherOpen && (
+            <form onSubmit={handleAddDispatcher} className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+              <p className="text-sm font-semibold text-slate-700">New Dispatcher</p>
+              {dispatcherFormError && (
+                <div className="flex items-center gap-1.5 text-xs text-red-600">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {dispatcherFormError}
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input
+                  required
+                  placeholder="Full name"
+                  value={dispatcherForm.name}
+                  onChange={e => setDispatcherForm(f => ({ ...f, name: e.target.value }))}
+                  className={`${inputCls} w-full`}
+                />
+                <input
+                  required
+                  type="email"
+                  placeholder="Email (login)"
+                  value={dispatcherForm.email}
+                  onChange={e => setDispatcherForm(f => ({ ...f, email: e.target.value }))}
+                  className={`${inputCls} w-full`}
+                />
+                <input
+                  required
+                  type="password"
+                  placeholder="Password (min. 8)"
+                  value={dispatcherForm.password}
+                  onChange={e => setDispatcherForm(f => ({ ...f, password: e.target.value }))}
+                  className={`${inputCls} w-full`}
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <button type="button" onClick={() => setAddDispatcherOpen(false)} className={btnGhost}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={submittingDispatcher} className={btnPrimary}>
+                  {submittingDispatcher ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {dispatchers.length === 0 ? (
+            <EmptyState
+              icon={ShieldCheck}
+              title="No dispatchers yet"
+              description="Add your first dispatcher above."
+            />
+          ) : (
+            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</th>
+                    <th className="px-4 py-3" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {dispatchers.map(d => {
+                    if (editDispatcherId === d.user_id) {
+                      return (
+                        <tr key={d.user_id} className="bg-blue-50">
+                          <td colSpan={2} className="px-4 py-3">
+                            <form onSubmit={handleEditDispatcher} className="space-y-3">
+                              {dispatcherFormError && (
+                                <div className="flex items-center gap-1.5 text-xs text-red-600">
+                                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                  {dispatcherFormError}
+                                </div>
+                              )}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <input
+                                  type="email"
+                                  placeholder="New email (optional)"
+                                  value={editDispatcherForm.email}
+                                  onChange={e => setEditDispatcherForm(f => ({ ...f, email: e.target.value }))}
+                                  className={`${inputCls} w-full`}
+                                />
+                                <input
+                                  type="password"
+                                  placeholder="New password (optional)"
+                                  value={editDispatcherForm.password}
+                                  onChange={e => setEditDispatcherForm(f => ({ ...f, password: e.target.value }))}
+                                  className={`${inputCls} w-full`}
+                                />
+                              </div>
+                              <div className="flex gap-2 justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => { setEditDispatcherId(null); setDispatcherFormError(null) }}
+                                  className={btnGhost}
+                                >
+                                  Cancel
+                                </button>
+                                <button type="submit" disabled={submittingDispatcher} className={btnPrimary}>
+                                  {submittingDispatcher ? 'Saving…' : 'Save'}
+                                </button>
+                              </div>
+                            </form>
+                          </td>
+                        </tr>
+                      )
+                    }
+                    return (
+                      <tr key={d.user_id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3 font-medium text-slate-900">{d.email}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-1 justify-end">
+                            <button
+                              onClick={() => {
+                                setEditDispatcherId(d.user_id)
+                                setEditDispatcherForm({ email: '', password: '' })
+                                setDispatcherFormError(null)
+                              }}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              title="Edit dispatcher"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteDispatcher(d.user_id)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Delete dispatcher"
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
