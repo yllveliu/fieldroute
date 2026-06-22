@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import HomePage from "./pages/HomePage";
 import CustomerPage from "./pages/CustomerPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
@@ -24,7 +25,7 @@ export default function App(): React.ReactElement {
         {/* Standalone — no AppLayout (no sidebar / top bar) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route element={<AppLayout />}>
+        <Route element={<ErrorBoundary><AppLayout /></ErrorBoundary>}>
           <Route path="/" element={<HomePage />} />
           <Route path="/customer" element={<CustomerPage />} />
           <Route path="/track" element={<TrackingPage />} />
