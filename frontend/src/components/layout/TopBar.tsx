@@ -21,7 +21,7 @@ export function TopBar({ title }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-3 ml-auto">
-        <button className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+        <button className="min-h-[44px] p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
           <Bell className="w-5 h-5" />
         </button>
         {/* User avatar placeholder */}

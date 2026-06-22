@@ -3,13 +3,20 @@ from sqlalchemy.orm import Session, joinedload
 from app.models.customer import Customer
 from app.models.job import Job
 from app.schemas.job import JobRequestCreate
+from app.services.email_service import notify_job_submitted
 
 
-def create_job_request(db: Session, payload: JobRequestCreate) -> Job:
+def create_job_request(
+    db: Session,
+    payload: JobRequestCreate,
+    requested_by_technician_id: int | None = None,
+) -> Job:
     """Store the customer and create a new job for an incoming service request.
 
     The job is created with status "new". Technician assignment, service-type
     classification and parts handling are intentionally left for later steps.
+    ``requested_by_technician_id`` is set when a technician requests a service
+    for themselves, so they can be excluded from assignment to it.
     """
     customer = Customer(
         name=payload.customer_name,
@@ -23,10 +30,18 @@ def create_job_request(db: Session, payload: JobRequestCreate) -> Job:
         customer_id=customer.id,
         raw_description=payload.raw_description,
         status="new",
+        requested_by_technician_id=requested_by_technician_id,
     )
     db.add(job)
     db.commit()
     db.refresh(job)
+
+    notify_job_submitted(
+        job_id=job.id,
+        customer_name=customer.name,
+        address=customer.address,
+        description=job.raw_description,
+    )
     return job
 
 

@@ -8,6 +8,7 @@ from app.db.session import get_db
 from app.models.job import Job
 from app.models.technician import Technician
 from app.schemas.technician import TechnicianResponse
+from app.services.skill_matching import required_skills_for
 
 router = APIRouter()
 
@@ -45,6 +46,8 @@ def _serialize(tech: Technician, current_job: Optional[int]) -> TechnicianRespon
 def list_technicians(
     skill: Optional[str] = None,
     status: Optional[str] = None,
+    exclude_job_id: Optional[int] = None,
+    assignable_only: bool = False,
     db: Session = Depends(get_db),
 ):
     stmt = select(Technician)
@@ -52,7 +55,33 @@ def list_technicians(
         stmt = stmt.where(cast(Technician.skills, String).contains(skill))
     if status:
         stmt = stmt.where(Technician.status == status)
+    if assignable_only:
+        # Only active, approved technicians can be assigned to jobs.
+        stmt = stmt.where(
+            Technician.is_active.is_(True),
+            Technician.application_status == "approved",
+        )
+
+    # When listing candidates for a specific job, exclude its requester and keep
+    # only technicians whose skills match the job's classified service type.
+    required_skills: set[str] = set()
+    if exclude_job_id is not None:
+        job = db.get(Job, exclude_job_id)
+        if job is not None:
+            if job.requested_by_technician_id is not None:
+                stmt = stmt.where(Technician.id != job.requested_by_technician_id)
+            required_skills = required_skills_for(job.ai_service_type)
+
     technicians = db.execute(stmt).scalars().all()
+
+    if required_skills:
+        # Empty required_skills means the service was general/unclassified —
+        # in that case show everyone; otherwise only skill-matching technicians.
+        technicians = [
+            t for t in technicians
+            if required_skills & {s.lower() for s in (t.skills or [])}
+        ]
+
     job_map = _current_job_map(db, [t.id for t in technicians])
     return [_serialize(t, job_map.get(t.id)) for t in technicians]
 

@@ -58,8 +58,8 @@ export default function CustomerTrackingPage(): React.ReactElement {
   const currentIndex = job ? STATUSES.indexOf(job.status) : -1;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 md:px-8 py-8">
-      <h1 className="text-2xl font-bold text-slate-900">Track Your Job</h1>
+    <div className="max-w-2xl mx-auto px-4 md:px-8 py-8 overflow-x-hidden">
+      <h1 className="text-xl md:text-2xl font-bold text-slate-900">Track Your Job</h1>
       <p className="mt-1 text-sm text-slate-500">
         Follow the progress of your service request.
       </p>
@@ -79,7 +79,7 @@ export default function CustomerTrackingPage(): React.ReactElement {
         <div className="mt-6 space-y-6">
           {/* Status timeline */}
           <div className="bg-white border border-slate-200 rounded-2xl p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               {STATUSES.map((status, i) => {
                 const completed = i < currentIndex;
                 const current = i === currentIndex;

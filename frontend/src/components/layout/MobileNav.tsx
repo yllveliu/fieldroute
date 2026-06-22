@@ -1,16 +1,20 @@
 import { NavLink } from 'react-router-dom'
-import { NAV_ITEMS } from './navItems'
+import { visibleNavItems } from './navItems'
+import { useAuth } from '@/context/AuthContext'
 
 export function MobileNav() {
+  const { user } = useAuth()
+  const navItems = visibleNavItems(user?.role)
+
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 flex">
-      {NAV_ITEMS.map(({ label, path, icon: Icon }) => (
+      {navItems.map(({ label, path, icon: Icon }) => (
         <NavLink
           key={path}
           to={path}
           end={path === '/'}
           className={({ isActive }) =>
-            `relative flex-1 flex flex-col items-center justify-center py-2 gap-0.5
+            `relative flex-1 flex flex-col items-center justify-center py-2 gap-0.5 min-h-[44px]
              text-xs font-medium transition-colors duration-150
              ${isActive ? 'text-blue-600' : 'text-slate-500'}`
           }

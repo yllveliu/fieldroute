@@ -1,7 +1,8 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Zap } from 'lucide-react'
-import { NAV_ITEMS } from './navItems'
+import { ChevronLeft, ChevronRight, LogOut, Zap } from 'lucide-react'
+import { visibleNavItems } from './navItems'
+import { useAuth } from '@/context/AuthContext'
 
 interface SidebarProps {
   collapsed: boolean
@@ -9,6 +10,10 @@ interface SidebarProps {
 }
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+  const { isAuth, user, logout } = useAuth()
+  const navigate = useNavigate()
+  const navItems = visibleNavItems(user?.role)
+
   return (
     <motion.aside
       animate={{ width: collapsed ? 64 : 220 }}
@@ -29,7 +34,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Nav items */}
       <nav className="flex-1 flex flex-col gap-1 px-2 py-2">
-        {NAV_ITEMS.map(({ label, path, icon: Icon }) => (
+        {navItems.map(({ label, path, icon: Icon }) => (
           <NavLink
             key={path}
             to={path}
@@ -49,10 +54,24 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         ))}
       </nav>
 
+      {/* Sign out */}
+      {isAuth && (
+        <button
+          onClick={() => {
+            logout()
+            navigate('/login')
+          }}
+          className="flex items-center gap-3 mx-2 mb-1 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+        >
+          <LogOut className="w-5 h-5 flex-shrink-0" />
+          {!collapsed && <span className="truncate">Sign Out</span>}
+        </button>
+      )}
+
       {/* Collapse toggle */}
       <button
         onClick={onToggle}
-        className="flex items-center justify-center h-10 mx-2 mb-4 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+        className="flex items-center justify-center min-h-[44px] h-10 mx-2 mb-4 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
       >
         {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
       </button>

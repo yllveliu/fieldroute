@@ -8,3 +8,4 @@ from app.models.service import Service  # noqa: F401
 from app.models.part import Part  # noqa: F401
 from app.models.job import Job  # noqa: F401
 from app.models.job_part import JobPart  # noqa: F401
+from app.models.job_event import JobEvent  # noqa: F401

@@ -58,7 +58,7 @@ export default function AssignmentModal({
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([getTechnicians(), getParts()])
+    Promise.all([getTechnicians({ excludeJobId: job.id, assignableOnly: true }), getParts()])
       .then(([techs, ps]) => {
         if (!mounted) return;
         setTechnicians(techs);
@@ -71,7 +71,7 @@ export default function AssignmentModal({
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [job.id]);
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {

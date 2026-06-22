@@ -8,5 +8,6 @@ class ClassifyResponse(BaseModel):
     ai_service_type: str
     ai_confidence: float
     ai_explanation: str
+    eta: str | None = None
 
     model_config = {"from_attributes": True}

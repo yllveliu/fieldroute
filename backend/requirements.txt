@@ -1,7 +1,12 @@
 fastapi
 uvicorn[standard]
-sqlalchemy
+sqlalchemy>=2.0.43
 psycopg[binary]
 alembic
 psycopg2-binary
 anthropic
+python-jose[cryptography]
+python-multipart
+passlib[bcrypt]
+bcrypt==4.0.1
+pydantic[email]

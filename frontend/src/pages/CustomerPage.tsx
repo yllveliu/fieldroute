@@ -4,9 +4,10 @@ import {
   Send, CheckCircle, AlertCircle, BrainCircuit,
   Truck, ClipboardList,
 } from 'lucide-react'
-import { createJob, ApiError } from '@/api'
+import { createJob, getMe, ApiError } from '@/api'
 import type { CreateJobResponse } from '@/api'
 import { PageHeader } from '@/components/layout'
+import { useAuth } from '@/context/AuthContext'
 
 const PLACEHOLDERS = [
   'e.g. Burst pipe under kitchen sink…',
@@ -51,7 +52,22 @@ const EMPTY_FORM = {
 }
 
 export default function CustomerPage() {
+  const { user } = useAuth()
+  const isTechnician = user?.role === 'technician'
   const [form, setForm] = useState(EMPTY_FORM)
+
+  // For a technician requesting a service, prefill their name from their account
+  // so they don't retype it (phone/address aren't on file, so stay editable).
+  useEffect(() => {
+    if (!isTechnician) return
+    let active = true
+    getMe()
+      .then((me) => {
+        if (active && me.name) setForm((f) => ({ ...f, customer_name: me.name as string }))
+      })
+      .catch(() => { /* leave form blank on failure */ })
+    return () => { active = false }
+  }, [isTechnician])
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState<CreateJobResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -86,13 +102,13 @@ export default function CustomerPage() {
   }
 
   return (
-    <div>
+    <div className="overflow-x-hidden px-4 md:px-6">
       <PageHeader
         title="New Service Request"
         subtitle="Tell us what's wrong and we'll dispatch a technician."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
         {/* LEFT — Form or Success state */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
           {submitted !== null ? (
@@ -122,8 +138,8 @@ export default function CustomerPage() {
                   setSubmitted(null)
                   setForm(EMPTY_FORM)
                 }}
-                className="mt-6 px-4 py-2 rounded-lg bg-green-600 text-white
-                  text-sm font-medium hover:bg-green-700 transition-colors"
+                className="mt-6 px-4 py-2 min-h-[44px] rounded-lg bg-green-600 text-white
+                  text-base font-medium hover:bg-green-700 transition-colors"
               >
                 Submit Another Request
               </button>
@@ -152,7 +168,7 @@ export default function CustomerPage() {
                   }
                   placeholder="Jane Smith"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300
-                    text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                    text-base focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-transparent transition"
                 />
               </div>
@@ -171,7 +187,7 @@ export default function CustomerPage() {
                   }
                   placeholder="+1 (555) 000-0000"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300
-                    text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                    text-base focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-transparent transition"
                 />
               </div>
@@ -190,7 +206,7 @@ export default function CustomerPage() {
                   }
                   placeholder="123 Main St, City, State"
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300
-                    text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                    text-base focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-transparent transition"
                 />
               </div>
@@ -214,7 +230,7 @@ export default function CustomerPage() {
                   onBlur={() => setProblemFocused(false)}
                   placeholder={PLACEHOLDERS[placeholderIndex]}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300
-                    text-sm resize-none focus:outline-none focus:ring-2
+                    text-base resize-none focus:outline-none focus:ring-2
                     focus:ring-blue-500 focus:border-transparent transition"
                 />
               </div>
@@ -223,8 +239,8 @@ export default function CustomerPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold
-                  text-sm hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed
+                className="w-full py-3 min-h-[44px] rounded-xl bg-blue-600 text-white font-semibold
+                  text-base hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed
                   transition-colors flex items-center justify-center gap-2"
               >
                 {submitting ? (

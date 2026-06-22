@@ -10,9 +10,9 @@ export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
   return (
     <div className="flex items-start justify-between mb-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-slate-900">{title}</h1>
         {subtitle && (
-          <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+          <p className="mt-1 text-base text-slate-500">{subtitle}</p>
         )}
       </div>
       {actions && <div className="flex-shrink-0 ml-4">{actions}</div>}
