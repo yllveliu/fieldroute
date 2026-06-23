@@ -7,6 +7,7 @@ from fastapi import (
     File,
     Form,
     HTTPException,
+    Request,
     UploadFile,
     status,
 )
@@ -15,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import FRONTEND_URL
 from app.core.dependencies import get_current_user
+from app.core.rate_limit import limiter
 from app.core.roles import ApplicationStatus, Role
 from app.core.security import (
     create_access_token,
@@ -59,7 +61,12 @@ ALLOWED_CV_CONTENT_TYPE = "application/pdf"
     status_code=status.HTTP_201_CREATED,
     summary="Register a new customer account",
 )
-def register(payload: RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def register(
+    request: Request,
+    payload: RegisterRequest,
+    db: Session = Depends(get_db),
+):
     """Public registration. Always creates a CUSTOMER — staff roles can never be
     self-assigned here. The customer can log in immediately, no verification."""
     existing = db.execute(
@@ -199,7 +206,12 @@ def apply_as_technician(
     response_model=LoginResponse,
     summary="Log in and receive a JWT access token",
 )
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(
+    request: Request,
+    payload: LoginRequest,
+    db: Session = Depends(get_db),
+):
     user = db.execute(
         select(User).where(User.email == payload.email)
     ).scalar_one_or_none()

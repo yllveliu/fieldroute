@@ -1,9 +1,10 @@
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user_optional, require_role
+from app.core.rate_limit import limiter
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.classify import ClassifyResponse
@@ -103,7 +104,9 @@ def get_job_status(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{job_id}/classify", response_model=ClassifyResponse)
+@limiter.limit("30/minute")
 def classify_job(
+    request: Request,
     job_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("dispatcher")),
