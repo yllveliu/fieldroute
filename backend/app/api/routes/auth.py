@@ -35,8 +35,8 @@ from app.schemas.auth import (
     RegisterRequest,
     RegisterResponse,
     ResetPasswordRequest,
+    TechnicianApplicationRequest,
     TechnicianApplicationResponse,
-    validate_skills,
 )
 from app.services import cv_reviewer
 from app.services.email_service import (
@@ -51,6 +51,26 @@ router = APIRouter()
 # keep the in-DB blob small.
 MAX_CV_BYTES = 5 * 1024 * 1024  # 5 MB
 ALLOWED_CV_CONTENT_TYPE = "application/pdf"
+
+
+def technician_application_form(
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    skills: list[str] = Form(...),
+) -> TechnicianApplicationRequest:
+    try:
+        return TechnicianApplicationRequest(
+            name=name,
+            email=email,
+            password=password,
+            skills=skills,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid technician application.",
+        ) from exc
 
 
 @router.post(
@@ -95,10 +115,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     summary="Apply to work as a technician (creates a pending account)",
 )
 def apply_as_technician(
-    name: str = Form(...),
-    email: str = Form(...),
-    password: str = Form(...),
-    skills: list[str] = Form(...),
+    payload: TechnicianApplicationRequest = Depends(technician_application_form),
     cv: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
@@ -106,21 +123,8 @@ def apply_as_technician(
     (application_status=pending) plus a Technician record holding the CV and an
     automatic AI suitability score. The applicant can log in to see their status
     but gains no technician access until an admin approves."""
-    if len(password) < 8:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Password must be at least 8 characters.",
-        )
-
-    try:
-        skills = validate_skills(skills)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
-        )
-
     existing = db.execute(
-        select(User).where(User.email == email)
+        select(User).where(User.email == payload.email)
     ).scalar_one_or_none()
     if existing:
         raise HTTPException(
@@ -150,15 +154,15 @@ def apply_as_technician(
     ai_score: float | None = None
     ai_summary: str | None = None
     try:
-        review = cv_reviewer.review_cv(cv_bytes, cv.content_type, skills)
+        review = cv_reviewer.review_cv(cv_bytes, cv.content_type, payload.skills)
         ai_score = review["match_score"]
         ai_summary = review["summary"]
     except Exception as exc:  # noqa: BLE001
-        logger.warning("AI CV review failed for applicant %s: %s", email, exc)
+        logger.warning("AI CV review failed for applicant %s: %s", payload.email, exc)
 
     user = User(
-        email=email,
-        password_hash=hash_password(password),
+        email=payload.email,
+        password_hash=hash_password(payload.password),
         role=Role.TECHNICIAN.value,
     )
     db.add(user)
@@ -166,8 +170,8 @@ def apply_as_technician(
 
     technician = Technician(
         user_id=user.id,
-        name=name,
-        skills=skills,
+        name=payload.name,
+        skills=payload.skills,
         status="offline",
         is_active=False,
         application_status=ApplicationStatus.PENDING.value,
@@ -182,7 +186,7 @@ def apply_as_technician(
     db.refresh(user)
     db.refresh(technician)
 
-    notify_application_received(email, name)
+    notify_application_received(payload.email, payload.name)
 
     return TechnicianApplicationResponse(
         user_id=user.id,

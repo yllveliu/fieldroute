@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,6 +31,11 @@ from app.services.email_service import (
 )
 
 router = APIRouter(dependencies=[Depends(require_role("admin"))])
+
+
+def _safe_download_filename(filename: str | None, fallback: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9._-]", "_", filename or fallback).strip("._")
+    return cleaned or fallback
 
 
 def _admin_response(technician: Technician) -> TechnicianAdminResponse:
@@ -234,7 +241,7 @@ def download_application_cv(technician_id: int, db: Session = Depends(get_db)):
     technician = db.get(Technician, technician_id)
     if technician is None or technician.cv_data is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found")
-    filename = technician.cv_filename or f"cv-{technician_id}.pdf"
+    filename = _safe_download_filename(technician.cv_filename, f"cv-{technician_id}.pdf")
     return Response(
         content=technician.cv_data,
         media_type=technician.cv_content_type or "application/pdf",

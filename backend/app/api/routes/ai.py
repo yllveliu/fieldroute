@@ -62,7 +62,7 @@ def classify(payload: ClassificationRequest) -> ClassificationResponse:
             messages=[{"role": "user", "content": payload.description}],
         )
     except anthropic.APIError as exc:
-        raise HTTPException(status_code=502, detail=f"AI service error: {exc}") from exc
+        raise HTTPException(status_code=502, detail="AI service error.") from exc
 
     text = next(
         (block.text for block in response.content if hasattr(block, "text")),

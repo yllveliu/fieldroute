@@ -1,19 +1,31 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+PositiveId = Annotated[int, Field(ge=1)]
 
 
 class RequiredPart(BaseModel):
-    part_id: int = Field(..., description="Primary key of the required part")
+    part_id: PositiveId = Field(..., description="Primary key of the required part")
     qty_needed: int = Field(..., ge=1, description="Quantity required for the job")
 
 
 class AssignJobRequest(BaseModel):
-    technician_id: int = Field(..., description="ID of the technician to assign")
+    technician_id: PositiveId = Field(..., description="ID of the technician to assign")
     required_parts: List[RequiredPart] = Field(
         default_factory=list, description="List of required parts and quantities"
     )
     eta_message: Optional[str] = Field(None, description="Optional ETA or message for the assignment")
+
+    @field_validator("eta_message")
+    @classmethod
+    def eta_message_not_blank(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("eta_message must not be empty")
+        return cleaned
 
 
 class AssignmentPartPreview(BaseModel):

@@ -28,4 +28,7 @@ def assign_job_endpoint(
     except HTTPException:
         raise
     except Exception as exc:  # pragma: no cover - keep generic guard
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error.",
+        ) from exc
