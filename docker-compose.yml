@@ -17,14 +17,14 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "5173:80"
     depends_on:
       - api
+    restart: unless-stopped
 
   db:
     image: postgres:15
