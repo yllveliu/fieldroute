@@ -39,16 +39,19 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             key={path}
             to={path}
             end={path === '/'}
+            aria-label={collapsed ? label : undefined}
+            title={collapsed ? label : undefined}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm
                font-medium transition-colors duration-150
+               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400
                ${isActive
                  ? 'bg-blue-600 text-white'
                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                }`
             }
           >
-            <Icon className="w-5 h-5 flex-shrink-0" />
+            <Icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             {!collapsed && <span className="truncate">{label}</span>}
           </NavLink>
         ))}
@@ -61,7 +64,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             logout()
             navigate('/login')
           }}
-          className="flex items-center gap-3 mx-2 mb-1 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          className="flex items-center gap-3 mx-2 mb-1 px-3 py-2 min-h-[44px] rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
           {!collapsed && <span className="truncate">Sign Out</span>}
@@ -71,9 +74,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       {/* Collapse toggle */}
       <button
         onClick={onToggle}
-        className="flex items-center justify-center min-h-[44px] h-10 mx-2 mb-4 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        className="flex items-center justify-center min-h-[44px] h-10 mx-2 mb-4 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
       >
-        {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+        {collapsed ? <ChevronRight className="w-4 h-4" aria-hidden="true" /> : <ChevronLeft className="w-4 h-4" aria-hidden="true" />}
       </button>
     </motion.aside>
   )

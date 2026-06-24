@@ -40,7 +40,22 @@ def _detect_required_skills(description: str) -> set[str]:
     return required_skills_for(service_type)
 
 
-@router.post("", response_model=JobRequestResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=JobRequestResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit a service request",
+    description=(
+        "Creates a new job from a customer's free-text description. "
+        "Open to all authenticated users. When submitted by a technician the system "
+        "checks that the request is for a service they do **not** provide, and tags the "
+        "job so that technician is excluded from the assignable list."
+    ),
+    responses={
+        201: {"description": "Job created successfully"},
+        422: {"description": "Validation error or technician submitting a job in their own trade"},
+    },
+)
 def submit_job_request(
     payload: JobRequestCreate,
     db: Session = Depends(get_db),
@@ -79,9 +94,14 @@ def submit_job_request(
     )
 
 
-@router.get("/{job_id}/status", response_model=JobStatusResponse)
+@router.get(
+    "/{job_id}/status",
+    response_model=JobStatusResponse,
+    summary="Get job status (customer tracking)",
+    description="Public polling endpoint used by the customer tracking page. Returns status, ETA, and assigned technician summary.",
+    responses={404: {"description": "Job not found"}},
+)
 def get_job_status(job_id: int, db: Session = Depends(get_db)):
-    """Return the current status of a job for polling-based customer tracking."""
     job = get_job(db, job_id)
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found.")

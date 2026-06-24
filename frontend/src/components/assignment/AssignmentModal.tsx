@@ -191,12 +191,15 @@ export default function AssignmentModal({
                     <button
                       key={tech.id}
                       type="button"
+                      aria-pressed={isSelected}
+                      aria-label={`${tech.name} — ${TECH_STATUS_LABELS[tech.status] ?? tech.status}${isMatch ? ", skill match" : ""}`}
                       className={`modal-tech-card${isSelected ? " modal-tech-card--selected" : ""}`}
                       onClick={() =>
                         setSelectedTechId(isSelected ? null : tech.id)
                       }
                     >
                       <span
+                        aria-hidden="true"
                         className="skill-match-dot"
                         title={isMatch ? "Skill match" : "No skill match"}
                         style={{ background: isMatch ? "#16A34A" : "#CBD5E1" }}
@@ -244,15 +247,15 @@ export default function AssignmentModal({
                       <div className="modal-part-stock">
                         {isOut ? (
                           <span className="stock-badge stock-badge--out">
-                            <AlertCircle size={11} /> Out of stock
+                            <AlertCircle size={11} aria-hidden="true" /> Out of stock
                           </span>
                         ) : isLow ? (
                           <span className="stock-badge stock-badge--low">
-                            <AlertTriangle size={11} /> Low ({avail})
+                            <AlertTriangle size={11} aria-hidden="true" /> Low ({avail})
                           </span>
                         ) : (
                           <span className="stock-badge stock-badge--ok">
-                            <CheckCircle size={11} /> In stock ({avail})
+                            <CheckCircle size={11} aria-hidden="true" /> In stock ({avail})
                           </span>
                         )}
                       </div>

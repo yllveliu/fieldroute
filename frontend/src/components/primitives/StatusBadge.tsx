@@ -15,6 +15,8 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
 
   return (
     <span
+      role="status"
+      aria-label={`Status: ${config.label}`}
       className={`inline-flex items-center font-medium rounded-full ${config.bgClass} ${config.textClass} ${sizeClass} ${pulse}`}
     >
       {config.label}

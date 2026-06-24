@@ -15,7 +15,7 @@ class Part(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    sku: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    sku: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
     stock_quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     reserved_qty: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     low_stock_threshold: Mapped[int] = mapped_column(

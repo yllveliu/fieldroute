@@ -3,8 +3,9 @@ import os
 import re
 
 import anthropic
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
+from app.core.limiter import limiter
 from app.schemas.ai import ClassificationRequest, ClassificationResponse
 
 router = APIRouter()
@@ -46,7 +47,8 @@ def _extract_json(text: str) -> dict:
 
 
 @router.post("/classify", response_model=ClassificationResponse)
-def classify(payload: ClassificationRequest) -> ClassificationResponse:
+@limiter.limit("30/minute")
+def classify(request: Request, payload: ClassificationRequest) -> ClassificationResponse:
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY is not configured")
