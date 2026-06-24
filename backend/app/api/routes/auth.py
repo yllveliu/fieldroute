@@ -7,9 +7,12 @@ from fastapi import (
     File,
     Form,
     HTTPException,
+    Request,
     UploadFile,
     status,
 )
+
+from app.core.limiter import limiter
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -59,7 +62,8 @@ ALLOWED_CV_CONTENT_TYPE = "application/pdf"
     status_code=status.HTTP_201_CREATED,
     summary="Register a new customer account",
 )
-def register(payload: RegisterRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
     """Public registration. Always creates a CUSTOMER — staff roles can never be
     self-assigned here. The customer can log in immediately, no verification."""
     existing = db.execute(
@@ -94,7 +98,9 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     status_code=status.HTTP_201_CREATED,
     summary="Apply to work as a technician (creates a pending account)",
 )
+@limiter.limit("5/minute")
 def apply_as_technician(
+    request: Request,
     name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
@@ -199,7 +205,8 @@ def apply_as_technician(
     response_model=LoginResponse,
     summary="Log in and receive a JWT access token",
 )
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.execute(
         select(User).where(User.email == payload.email)
     ).scalar_one_or_none()
@@ -250,7 +257,8 @@ def get_me(current_user: User = Depends(get_current_user)):
     "/forgot-password",
     summary="Request a password-reset email",
 )
-def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def forgot_password(request: Request, payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
     """Always returns the same response whether or not the email exists, so the
     endpoint cannot be used to discover which emails are registered."""
     user = db.execute(
