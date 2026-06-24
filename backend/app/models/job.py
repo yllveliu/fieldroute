@@ -18,16 +18,16 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False)
+    customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False, index=True)
     service_id: Mapped[int | None] = mapped_column(ForeignKey("services.id"), nullable=True)
-    technician_id: Mapped[int | None] = mapped_column(ForeignKey("technicians.id"), nullable=True)
+    technician_id: Mapped[int | None] = mapped_column(ForeignKey("technicians.id"), nullable=True, index=True)
     # The technician who *requested* this job for themselves (if any). Used to
     # keep them out of the assignable-technician list for their own request.
     requested_by_technician_id: Mapped[int | None] = mapped_column(
         ForeignKey("technicians.id"), nullable=True
     )
     raw_description: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[str] = mapped_column(String, nullable=False, default="new")
+    status: Mapped[str] = mapped_column(String, nullable=False, default="new", index=True)
     eta_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

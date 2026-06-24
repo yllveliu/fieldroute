@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class TechnicianSummary(BaseModel):
@@ -31,6 +32,14 @@ class JobRequestCreate(BaseModel):
     phone: str = Field(..., min_length=1)
     address: str = Field(..., min_length=1)
     raw_description: str = Field(..., min_length=1)
+
+    @field_validator("customer_name", "phone", "address", "raw_description")
+    @classmethod
+    def text_not_blank(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("must not be empty")
+        return cleaned
 
 
 class JobRequestResponse(BaseModel):

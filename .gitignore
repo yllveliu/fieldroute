@@ -2,6 +2,8 @@ node_modules/
 venv/
 __pycache__/
 .env
+.env.production
 db_data/
 dist/
 /.vite
+e2e/.e2e-creds.json

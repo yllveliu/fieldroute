@@ -87,7 +87,7 @@ export default function HomePage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-blue-200 text-sm font-medium mb-6 border border-white/20">
             <Zap className="w-3.5 h-3.5" />
-            FieldRoute v2 — Sprint 2
+            FieldRoute · AI Field Service
           </div>
 
           <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
@@ -95,7 +95,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg text-blue-200 mt-4 max-w-lg mx-auto leading-relaxed">
-            AI-powered field service management — classify jobs, assign
+            AI-powered field service management. Classify jobs, assign
             technicians, and track every step in real time.
           </p>
 
@@ -107,10 +107,10 @@ export default function HomePage() {
               Go to Dispatcher <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => navigate('/jobs')}
+              onClick={() => navigate('/dispatcher')}
               className="w-full md:w-auto min-h-[44px] px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 flex items-center justify-center gap-2 transition-colors"
             >
-              Track a Job
+              View All Jobs
             </button>
           </div>
         </motion.div>

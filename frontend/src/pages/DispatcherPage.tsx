@@ -123,25 +123,27 @@ export default function DispatcherPage() {
       </div>
 
       {/* Filter chips + search */}
-      <div className="flex flex-wrap gap-2 items-center mt-6">
-        {FILTER_OPTIONS.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => setFilter(opt.value)}
-            className={
-              filter === opt.value
-                ? 'px-3 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-blue-600 text-white'
-                : 'px-3 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }
-          >
-            {opt.label}
-          </button>
-        ))}
+      <div className="mt-6 space-y-3">
+        <div className="flex flex-wrap gap-2">
+          {FILTER_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setFilter(opt.value)}
+              className={
+                filter === opt.value
+                  ? 'px-3 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-blue-600 text-white'
+                  : 'px-3 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search jobs…"
-          className="ml-auto flex-1 min-w-[180px] max-w-xs px-3 py-1.5 rounded-lg border border-slate-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:max-w-xs px-3 py-2 rounded-lg border border-slate-300 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 

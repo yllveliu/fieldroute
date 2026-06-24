@@ -46,7 +46,12 @@ def _to_job_detail(job: Job) -> JobDetailResponse:
     )
 
 
-@router.get("/jobs", response_model=List[DispatcherJobItem])
+@router.get(
+    "/jobs",
+    response_model=List[DispatcherJobItem],
+    summary="List all jobs for the dispatcher board",
+    description="Returns every job in reverse-chronological order with customer, service, and technician summaries embedded. Requires dispatcher role.",
+)
 def list_dispatcher_jobs(db: Session = Depends(get_db)):
     stmt = (
         select(Job)
@@ -76,7 +81,25 @@ def list_dispatcher_jobs(db: Session = Depends(get_db)):
     return result
 
 
-@router.patch("/jobs/{job_id}/status", response_model=JobDetailResponse)
+@router.patch(
+    "/jobs/{job_id}/status",
+    response_model=JobDetailResponse,
+    summary="Advance a job's status",
+    description=(
+        "Performs a status transition on the job. Valid transitions:\n\n"
+        "| From | To |\n"
+        "|------|----|\n"
+        "| `new` | `categorized`, `cancelled` |\n"
+        "| `categorized` | `assigned`, `cancelled` |\n"
+        "| `assigned` | `en_route`, `cancelled` |\n"
+        "| `en_route` | `done`, `cancelled` |\n\n"
+        "Cancelling a job with an assigned technician releases the technician back to `available`."
+    ),
+    responses={
+        400: {"description": "Invalid status transition"},
+        404: {"description": "Job not found"},
+    },
+)
 def update_job_status(
     job_id: int,
     body: StatusUpdateRequest,

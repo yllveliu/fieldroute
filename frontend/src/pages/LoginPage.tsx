@@ -10,11 +10,11 @@ import { useAuth } from '@/context/AuthContext'
 // Where each role lands after signing in.
 function landingFor(role: Role, status: ApplicationStatus | null): string {
   switch (role) {
-    case 'admin':      return '/'
+    case 'admin':      return '/dashboard'
     case 'dispatcher': return '/dispatcher'
     case 'technician': return status === 'approved' ? '/technician/job' : '/application-status'
     case 'customer':   return '/customer'
-    default:           return '/'
+    default:           return '/dashboard'
   }
 }
 
@@ -73,21 +73,23 @@ export default function LoginPage() {
 
           {/* Error banner */}
           {error && (
-            <div className="mb-4 bg-red-950 border border-red-800 rounded-xl p-3 flex items-start gap-2 text-sm text-red-300">
-              <AlertCircle size={15} className="mt-0.5 shrink-0" />
+            <div role="alert" className="mb-4 bg-red-950 border border-red-800 rounded-xl p-3 flex items-start gap-2 text-sm text-red-300">
+              <AlertCircle size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label htmlFor="login-email" className="block text-sm font-medium text-slate-300 mb-1">
                 Email address
               </label>
               <input
+                id="login-email"
                 required
                 type="email"
+                autoComplete="email"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 placeholder="you@example.com"
@@ -97,12 +99,14 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label htmlFor="login-password" className="block text-sm font-medium text-slate-300 mb-1">
                 Password
               </label>
               <input
+                id="login-password"
                 required
                 type="password"
+                autoComplete="current-password"
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="••••••••"

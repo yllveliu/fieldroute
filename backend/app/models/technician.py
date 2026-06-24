@@ -33,7 +33,7 @@ class Technician(Base):
     )
     name: Mapped[str] = mapped_column(String, nullable=False)
     skills: Mapped[list | None] = mapped_column(JSON, nullable=True)
-    status: Mapped[str] = mapped_column(String, nullable=False, default="available")
+    status: Mapped[str] = mapped_column(String, nullable=False, default="available", index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, server_default="true")
 
     # --- Technician application (self-service apply → admin review) ---

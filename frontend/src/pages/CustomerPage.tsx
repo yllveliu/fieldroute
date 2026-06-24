@@ -24,7 +24,7 @@ const NEXT_STEPS = [
     title: 'AI Categorizes Your Request',
     detail:
       'Our AI reads your description and detects the service type ' +
-      'automatically — plumbing, electrical, HVAC, and more.',
+      'automatically: plumbing, electrical, HVAC, and more.',
   },
   {
     icon: Truck,
