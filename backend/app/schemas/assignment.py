@@ -41,12 +41,12 @@ class AssignmentGateResponse(BaseModel):
     required_parts: List[AssignmentPartPreview] = Field(default_factory=list)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "job_id": 123,
                 "technician_id": 5,
-                "status": "assignment_gate_skeleton_ready",
-                "message": "Assignment gate skeleton is ready for Sprint 2 implementation.",
+                "status": "assigned",
+                "message": "Technician assigned successfully.",
                 "required_parts": [{"part_id": 10, "qty_needed": 2}],
             }
         }
