@@ -6,3 +6,4 @@ __pycache__/
 db_data/
 dist/
 /.vite
+e2e/.e2e-creds.json

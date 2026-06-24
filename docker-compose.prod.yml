@@ -1,9 +1,9 @@
-version: '3.8'
+﻿version: '3.8'
 services:
   api:
     build:
       context: ./backend
-      target: builder
+      target: production
     ports:
       - "8000:8000"
     env_file:
