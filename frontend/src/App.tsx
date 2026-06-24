@@ -5,6 +5,7 @@ import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { useAuth } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
+const LandingPage = React.lazy(() => import("./pages/LandingPage"));
 const HomePage = React.lazy(() => import("./pages/HomePage"));
 const CustomerPage = React.lazy(() => import("./pages/CustomerPage"));
 const CustomerTrackingPage = React.lazy(() => import("./pages/CustomerTrackingPage"));
@@ -43,7 +44,7 @@ function AppIndex(): React.ReactElement {
     case "customer":
       return <Navigate to="/customer" replace />;
     default:
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/dashboard" replace />;
   }
 }
 
@@ -52,7 +53,8 @@ export default function App(): React.ReactElement {
     <Router>
       <Suspense fallback={<PageSpinner />}>
         <Routes>
-          {/* Standalone — no AppLayout */}
+          {/* Public — no AppLayout, no auth required */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -62,7 +64,7 @@ export default function App(): React.ReactElement {
 
           <Route element={<ErrorBoundary><AppLayout /></ErrorBoundary>}>
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <AppIndex />
