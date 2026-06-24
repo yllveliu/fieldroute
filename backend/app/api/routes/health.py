@@ -7,8 +7,9 @@ from app.db.session import get_db
 router = APIRouter(tags=["health"])
 
 
-@router.get(
+@router.api_route(
     "/health",
+    methods=["GET", "HEAD"],
     summary="API liveness check",
     description="Returns `ok` immediately. Use this to verify the service is reachable.",
     responses={200: {"content": {"application/json": {"example": {"status": "ok", "service": "fieldroute-api"}}}}},
