@@ -125,11 +125,11 @@ const stagger = {
 
 function landingFor(role: Role, status: ApplicationStatus | null | undefined): string {
   switch (role) {
-    case 'admin':      return '/'
+    case 'admin':      return '/dashboard'
     case 'dispatcher': return '/dispatcher'
     case 'technician': return status === 'approved' ? '/technician/job' : '/application-status'
     case 'customer':   return '/customer'
-    default:           return '/'
+    default:           return '/dashboard'
   }
 }
 
