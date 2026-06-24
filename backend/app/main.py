@@ -15,8 +15,32 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=APP_NAME,
-    description="Backend API for the FieldRoute field-service dispatch platform.",
+    description=(
+        "**FieldRoute** is a field-service dispatch platform.\n\n"
+        "## Authentication\n"
+        "Most endpoints require a JWT bearer token. Obtain one via `POST /auth/login`.\n\n"
+        "## Roles\n"
+        "| Role | Access |\n"
+        "|------|--------|\n"
+        "| `customer` | Submit jobs, track own job status |\n"
+        "| `technician` | View and update assigned jobs, inventory |\n"
+        "| `dispatcher` | Full board, classify, assign, manage technicians |\n"
+        "| `admin` | Manage staff accounts, review technician applications |\n"
+    ),
     version=APP_VERSION,
+    contact={"name": "FieldRoute Team"},
+    openapi_tags=[
+        {"name": "health", "description": "Liveness and readiness probes."},
+        {"name": "auth", "description": "Registration, login, password reset."},
+        {"name": "jobs", "description": "Job lifecycle — submit, classify, track."},
+        {"name": "dispatcher", "description": "Dispatcher board and status transitions."},
+        {"name": "technician", "description": "Technician job view and status updates."},
+        {"name": "technicians", "description": "Technician roster management."},
+        {"name": "parts", "description": "Inventory / parts management."},
+        {"name": "ai", "description": "AI-powered job classification."},
+        {"name": "admin", "description": "Admin-only: staff accounts and applications."},
+        {"name": "debug", "description": "Development-only diagnostic endpoints."},
+    ],
 )
 
 app.state.limiter = limiter
