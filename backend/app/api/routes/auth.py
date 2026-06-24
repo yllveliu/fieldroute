@@ -120,6 +120,7 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 )
 @limiter.limit("5/minute")
 def apply_as_technician(
+    request: Request,
     payload: TechnicianApplicationRequest = Depends(technician_application_form),
     cv: UploadFile = File(...),
     db: Session = Depends(get_db),

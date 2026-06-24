@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-import os
+import logging
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 import app.db.base  # noqa: F401 — registers all ORM models so SQLAlchemy mappers configure at startup
 from app.api.router import api_router
@@ -12,11 +13,8 @@ from app.core.limiter import limiter
 
 logger = logging.getLogger(__name__)
 
-ENV = os.getenv("ENV", "development")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-allowed_origins = ["*"] if ENV != "production" else [FRONTEND_URL]
-
 app = FastAPI(
+    redirect_slashes=False,
     title=APP_NAME,
     description=(
         "**FieldRoute** is a field-service dispatch platform.\n\n"
@@ -46,26 +44,30 @@ app = FastAPI(
     ],
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+if ENVIRONMENT == "production":
+    cors_origins = [FRONTEND_URL]
+else:
+    cors_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-@app.middleware("http")
-async def force_dev_wildcard_preflight(request: Request, call_next):
-    response = await call_next(request)
-    if (
-        ENV != "production"
-        and request.method == "OPTIONS"
-        and request.headers.get("access-control-request-method")
-    ):
-        response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again later."},
+    )
 
 
-# Include central API router (mounts health and future routes)
 app.include_router(api_router)
