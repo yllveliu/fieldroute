@@ -487,11 +487,11 @@ export default function AdminConsolePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    {['Name', 'Skills', 'Status', 'Current Job', ''].map(h => (
-                      <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                        {h}
-                      </th>
-                    ))}
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
+                    <th className="hidden sm:table-cell text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Skills</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                    <th className="hidden sm:table-cell text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Current Job</th>
+                    <th className="px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -581,7 +581,7 @@ export default function AdminConsolePage() {
                     return (
                       <tr key={tech.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-4 py-3 font-medium text-slate-900">{tech.name}</td>
-                        <td className="px-4 py-3">
+                        <td className="hidden sm:table-cell px-4 py-3">
                           {tech.skills.length > 0
                             ? tech.skills.map(s => (
                                 <span
@@ -605,7 +605,7 @@ export default function AdminConsolePage() {
                               : tech.status.charAt(0).toUpperCase() + tech.status.slice(1)}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-slate-500">
+                        <td className="hidden sm:table-cell px-4 py-3 text-slate-500">
                           {tech.current_job != null ? `Job #${tech.current_job}` : '—'}
                         </td>
                         <td className="px-4 py-3">
@@ -744,11 +744,11 @@ export default function AdminConsolePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="text-left  px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
-                    <th className="text-left  px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">SKU</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Name</th>
+                    <th className="hidden sm:table-cell text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">SKU</th>
                     <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Stock</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Reserved</th>
-                    <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Min. Stock</th>
+                    <th className="hidden sm:table-cell text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Reserved</th>
+                    <th className="hidden sm:table-cell text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Min. Stock</th>
                     <th className="px-4 py-3" />
                   </tr>
                 </thead>
@@ -826,10 +826,10 @@ export default function AdminConsolePage() {
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-slate-500 font-mono text-xs">{part.sku}</td>
+                        <td className="hidden sm:table-cell px-4 py-3 text-slate-500 font-mono text-xs">{part.sku}</td>
                         <td className="px-4 py-3 text-right text-slate-700">{part.stock_quantity}</td>
-                        <td className="px-4 py-3 text-right text-slate-700">{part.reserved_qty}</td>
-                        <td className="px-4 py-3 text-right text-slate-700">{part.low_stock_threshold}</td>
+                        <td className="hidden sm:table-cell px-4 py-3 text-right text-slate-700">{part.reserved_qty}</td>
+                        <td className="hidden sm:table-cell px-4 py-3 text-right text-slate-700">{part.low_stock_threshold}</td>
                         <td className="px-4 py-3">
                           <div className="flex justify-end">
                             <button
