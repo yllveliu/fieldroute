@@ -77,6 +77,14 @@ def update_technician_job_status(
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found.")
 
+    # Only the technician assigned to this job may update its status.
+    technician = current_user.technician
+    if technician is None or job.technician_id != technician.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not assigned to this job.",
+        )
+
     required_current = TECHNICIAN_TRANSITIONS[body.status]
     if job.status != required_current:
         raise HTTPException(
