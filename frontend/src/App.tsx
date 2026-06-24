@@ -73,9 +73,9 @@ export default function App(): React.ReactElement {
             />
 
             {/* Dispatcher */}
-            <Route path="/dispatcher" element={<ProtectedRoute allow={["dispatcher"]}><DispatcherPage /></ProtectedRoute>} />
-            <Route path="/technicians" element={<ProtectedRoute allow={["dispatcher"]}><TechniciansPage /></ProtectedRoute>} />
-            <Route path="/ai" element={<ProtectedRoute allow={["dispatcher"]}><AIPage /></ProtectedRoute>} />
+            <Route path="/dispatcher" element={<ProtectedRoute allow={["dispatcher", "admin"]}><DispatcherPage /></ProtectedRoute>} />
+            <Route path="/technicians" element={<ProtectedRoute allow={["dispatcher", "admin"]}><TechniciansPage /></ProtectedRoute>} />
+            <Route path="/ai" element={<ProtectedRoute allow={["dispatcher", "admin"]}><AIPage /></ProtectedRoute>} />
 
             {/* Technician */}
             <Route path="/technician/job" element={<ProtectedRoute allow={["technician"]}><TechnicianJobPage /></ProtectedRoute>} />

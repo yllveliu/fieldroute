@@ -25,7 +25,7 @@ export function ProtectedRoute({ children, allow }: Props) {
   }
 
   if (allow && user && !allow.includes(user.role)) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return <>{children}</>

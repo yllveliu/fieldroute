@@ -107,10 +107,10 @@ export default function HomePage() {
               Go to Dispatcher <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => navigate('/jobs')}
+              onClick={() => navigate('/dispatcher')}
               className="w-full md:w-auto min-h-[44px] px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 flex items-center justify-center gap-2 transition-colors"
             >
-              Track a Job
+              View All Jobs
             </button>
           </div>
         </motion.div>
