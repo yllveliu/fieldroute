@@ -28,10 +28,18 @@ class PartUpdateRequest(BaseModel):
 
 
 class PartCreateRequest(BaseModel):
-    name: str
-    sku: str
+    name: str = Field(..., min_length=1)
+    sku: str = Field(..., min_length=1)
     stock_quantity: int = Field(..., ge=0)
     low_stock_threshold: int = Field(5, ge=0)
+
+    @field_validator("name", "sku")
+    @classmethod
+    def text_not_blank(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("must not be empty")
+        return cleaned
 
 
 class PartAdminResponse(BaseModel):

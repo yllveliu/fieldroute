@@ -1,11 +1,13 @@
-from typing import List
+from typing import Annotated, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+PositiveId = Annotated[int, Field(ge=1)]
 
 
 class AssignRequest(BaseModel):
-    technician_id: int
-    part_ids: List[int] = []
+    technician_id: PositiveId
+    part_ids: List[PositiveId] = Field(default_factory=list)
 
 
 class AssignResponse(BaseModel):

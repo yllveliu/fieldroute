@@ -30,9 +30,8 @@ def assign_job_endpoint(
         return assign_job(db=db, job_id=job_id, technician_id=payload.technician_id, part_ids=payload.part_ids, changed_by=current_user.id)
     except HTTPException:
         raise
-    except Exception:
-        logger.exception("Unexpected error in assign_job_endpoint job_id=%s", job_id)
+    except Exception as exc:  # pragma: no cover - keep generic guard
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred during assignment.",
-        )
+            detail="Internal server error.",
+        ) from exc
