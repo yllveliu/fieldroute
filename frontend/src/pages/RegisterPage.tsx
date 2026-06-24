@@ -136,19 +136,22 @@ export default function RegisterPage() {
           </div>
 
           {error && (
-            <div className="mb-4 bg-red-950 border border-red-800 rounded-xl p-3 flex items-start gap-2 text-sm text-red-300">
-              <AlertCircle size={15} className="mt-0.5 shrink-0" />
+            <div role="alert" className="mb-4 bg-red-950 border border-red-800 rounded-xl p-3 flex items-start gap-2 text-sm text-red-300">
+              <AlertCircle size={15} className="mt-0.5 shrink-0" aria-hidden="true" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Full Name <span className="text-red-500">*</span>
+              <label htmlFor="reg-name" className="block text-sm font-medium text-slate-300 mb-1">
+                Full Name <span className="text-red-500" aria-hidden="true">*</span>
+                <span className="sr-only">(required)</span>
               </label>
               <input
+                id="reg-name"
                 required
+                autoComplete="name"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="Jane Smith"
@@ -157,12 +160,15 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Email address <span className="text-red-500">*</span>
+              <label htmlFor="reg-email" className="block text-sm font-medium text-slate-300 mb-1">
+                Email address <span className="text-red-500" aria-hidden="true">*</span>
+                <span className="sr-only">(required)</span>
               </label>
               <input
+                id="reg-email"
                 required
                 type="email"
+                autoComplete="email"
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                 placeholder="you@example.com"
@@ -171,12 +177,15 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Password <span className="text-red-500">*</span>
+              <label htmlFor="reg-password" className="block text-sm font-medium text-slate-300 mb-1">
+                Password <span className="text-red-500" aria-hidden="true">*</span>
+                <span className="sr-only">(required, minimum 8 characters)</span>
               </label>
               <input
+                id="reg-password"
                 required
                 type="password"
+                autoComplete="new-password"
                 value={form.password}
                 onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                 placeholder="Min. 8 characters"
