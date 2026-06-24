@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+import logging
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -7,6 +10,8 @@ import app.db.base  # noqa: F401 — registers all ORM models so SQLAlchemy mapp
 from app.api.router import api_router
 from app.core.config import APP_NAME, APP_VERSION, ENVIRONMENT, FRONTEND_URL
 from app.core.limiter import limiter
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=APP_NAME,
@@ -31,5 +36,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    # Log the full traceback server-side but never expose it to the client.
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again later."},
+    )
+
 
 app.include_router(api_router)
