@@ -1,4 +1,7 @@
-export const BASE_URL = '/api'
+// Split-host deploys (e.g. Vercel frontend + Render backend) inject the API's
+// absolute URL at build time via VITE_API_URL. Locally it falls back to "/api",
+// which the Vite dev server / nginx proxy forwards to the backend.
+export const BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 export class ApiError extends Error {
   constructor(

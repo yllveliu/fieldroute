@@ -10,4 +10,6 @@ echo "Running seed script..."
 python -m app.db.seed
 
 echo "Starting server..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+# Hosts like Render/Railway inject the port to listen on via $PORT; fall back to
+# 8000 for local Docker Compose where the port is fixed.
+exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}"
