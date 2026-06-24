@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+import logging
 import os
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 import app.db.base  # noqa: F401 — registers all ORM models so SQLAlchemy mappers configure at startup
 from app.api.router import api_router

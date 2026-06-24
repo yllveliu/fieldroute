@@ -20,7 +20,7 @@ class ConflictResponse(BaseModel):
     )
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "error": "assignment_conflict",
                 "reason": "technician_unavailable",
