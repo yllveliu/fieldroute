@@ -87,7 +87,7 @@ export default function HomePage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-blue-200 text-sm font-medium mb-6 border border-white/20">
             <Zap className="w-3.5 h-3.5" />
-            FieldRoute v2 — Sprint 2
+            FieldRoute · AI Field Service
           </div>
 
           <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
@@ -95,7 +95,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg text-blue-200 mt-4 max-w-lg mx-auto leading-relaxed">
-            AI-powered field service management — classify jobs, assign
+            AI-powered field service management. Classify jobs, assign
             technicians, and track every step in real time.
           </p>
 

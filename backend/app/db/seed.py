@@ -1,3 +1,5 @@
+from app.core.roles import ApplicationStatus, Role
+from app.core.security import hash_password
 from app.db.base import Base  # noqa: F401 — registers all model metadata
 from app.db.session import SessionLocal, engine
 from app.models.customer import Customer
@@ -6,6 +8,7 @@ from app.models.job_part import JobPart
 from app.models.part import Part
 from app.models.service import Service
 from app.models.technician import Technician
+from app.models.user import User
 
 # ---------------------------------------------------------------------------
 # Data
@@ -89,6 +92,25 @@ JOBS = [
         "technician": None,
     },
 ]
+
+# Demo login accounts — one per role so a freshly seeded database is usable
+# immediately (and to power the "Login as ..." demo buttons in the UI). All
+# share one throwaway password: these are public demo credentials, not secrets.
+DEMO_PASSWORD = "demo1234"
+
+DEMO_USERS = [
+    {"email": "admin@fieldroute.com",      "password": DEMO_PASSWORD, "role": Role.ADMIN.value},
+    {"email": "dispatcher@fieldroute.com", "password": DEMO_PASSWORD, "role": Role.DISPATCHER.value},
+    {"email": "customer@fieldroute.com",   "password": DEMO_PASSWORD, "role": Role.CUSTOMER.value},
+]
+
+# The technician demo account is linked to an existing seeded technician (by
+# name) because the technician-only pages require current_user.technician.
+DEMO_TECHNICIAN = {
+    "email": "technician@fieldroute.com",
+    "password": DEMO_PASSWORD,
+    "technician": "Diego Ramos",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -180,6 +202,40 @@ def _seed_jobs(
         session.add(job)
 
 
+def _seed_users(session: object, technicians: dict[str, Technician]) -> None:
+    """Create one demo login per role so a freshly deployed instance is usable
+    immediately. Idempotent: an account is created only if its email does not
+    already exist, so re-running the seed never overwrites changed passwords."""
+    for data in DEMO_USERS:
+        existing = session.query(User).filter_by(email=data["email"]).first()
+        if not existing:
+            session.add(
+                User(
+                    email=data["email"],
+                    password_hash=hash_password(data["password"]),
+                    role=data["role"],
+                )
+            )
+
+    # Technician demo account: create the login, then link it to an existing
+    # seeded technician so the technician-only pages (which require
+    # current_user.technician) work on first login.
+    tech_user = session.query(User).filter_by(email=DEMO_TECHNICIAN["email"]).first()
+    if tech_user is None:
+        tech_user = User(
+            email=DEMO_TECHNICIAN["email"],
+            password_hash=hash_password(DEMO_TECHNICIAN["password"]),
+            role=Role.TECHNICIAN.value,
+        )
+        session.add(tech_user)
+        session.flush()  # assign tech_user.id before linking
+    demo_tech = technicians.get(DEMO_TECHNICIAN["technician"])
+    if demo_tech is not None and demo_tech.user_id is None:
+        demo_tech.user_id = tech_user.id
+        demo_tech.application_status = ApplicationStatus.APPROVED.value
+        demo_tech.is_active = True
+
+
 def run() -> None:
     Base.metadata.create_all(engine)
 
@@ -190,8 +246,9 @@ def run() -> None:
         services = _seed_services(session)
         customers = _seed_customers(session)
         _seed_jobs(session, services, customers, technicians)
+        _seed_users(session, technicians)
         session.commit()
-        print("Seed complete: technicians=6, parts=6, services=6, customers=4, jobs=6")
+        print("Seed complete: technicians=6, parts=6, services=6, customers=4, jobs=6, demo logins=4")
     except Exception:
         session.rollback()
         raise
